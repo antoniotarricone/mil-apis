@@ -1,0 +1,183 @@
+openapi: 3.0.3
+
+info:
+  title: Payment Card Data Service
+  version: 3.0.0
+  description: Service to retrieve payment card data
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+- description: Service URL
+  url: https://server_address
+
+security: 
+- ApiKeyAuth: []
+
+paths:
+  /cards:
+    # ----------------------------------------------------------------------------------------------
+    # POST
+    #
+    # Retrieves payment card data.
+    #
+    # This should be a GET operation but the ID of the resource is a cardholder data: the PAN.
+    # For this reason, to avoid that it is traced, for example by a Web Server, it is used the POST
+    # verb instead of the GET verb. In this way the cardholder data is put in the request body and
+    # not in the URL. 
+    # ----------------------------------------------------------------------------------------------
+    post:
+      summary: Retrieves payment card data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetCardDataReq'
+      responses:
+        "200":
+          description: Payment card found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCardDataRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Payment card not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "415":
+          description: Unsupported media type. Did you provide application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+components:
+  schemas:
+    # ------------------------------------------------------
+    # Pan
+    # ------------------------------------------------------
+    Pan:
+      description: Payment card's PAN
+      type: string
+      pattern: "^\\d{16,19}$"
+      example: "4769328596019370"
+    
+    # ------------------------------------------------------
+    # Tax code
+    # ------------------------------------------------------
+    TaxCode:
+      description: Tax code of the payment card owner
+      type: string
+      pattern: "^([A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z])|(\\d{11})$"
+      example:
+        value: "CHCZLN73D08A662B"
+    
+    # ------------------------------------------------------
+    # Issuer identification number
+    # ------------------------------------------------------
+    Iin:
+      description: Issuer identification number. For Bancomat/PagoBancomat cards it's the Issuer ABI code. For international cards it's the BIN assigned by the card scheme (VISA, MasterCard, etc.) to the Issuer.'
+      type: string
+      pattern: "^\\d{5,8}$"
+      example: "01005"
+    
+    # ------------------------------------------------------
+    # Bancomat/PagoBancomat card number
+    # ------------------------------------------------------
+    CardNumber:
+      description: Bancomat/PagoBancomat card number
+      type: string
+      pattern: "^\\d{8}$"
+      example: "00384062"
+    
+    # ------------------------------------------------------
+    # Expiration date of the payment card
+    # ------------------------------------------------------
+    ExpirationDate:
+      description: Expiration date of the payment card
+      type: string
+      minLength: 10
+      maxLength: 10
+      format: date
+      example: "2022-11-07"
+    
+    # ------------------------------------------------------
+    # Payment card type
+    # ------------------------------------------------------
+    Type:
+      description: Payment card type (DEB = debit; PP = pre-paid; CRE = credit)
+      enum:
+      - DEB
+      - PP
+      - CRE
+      type: string
+      example: "DEB"
+    
+    # ------------------------------------------------------
+    # Payment card status
+    # ------------------------------------------------------
+    Status:
+      description: Payment card status (V = valid; BR = Blocked, reversible)
+      enum:
+      - V
+      - BR
+      type: string
+      example: "V"
+
+    # ------------------------------------------------------
+    # GetCardDataReq
+    # ------------------------------------------------------
+    GetCardDataReq:
+      description: Request to retrieve the payment card data
+      type: object
+      additionalProperties: false
+      properties:
+        pan:
+          $ref: '#/components/schemas/Pan'
+      required:
+      - pan
+      example:
+        pan: "4769328596019370"
+    
+    # ------------------------------------------------------
+    # GetCardDataRes
+    # ------------------------------------------------------
+    GetCardDataRes:
+      description: Response when all went ok and the payment card data is successfully retrieved
+      type: object
+      additionalProperties: false
+      properties:
+        taxCode:
+          $ref: '#/components/schemas/TaxCode'
+        cardNumber:
+          $ref: '#/components/schemas/CardNumber'
+        iin:
+          $ref: '#/components/schemas/Iin'
+        expirationDate:
+          $ref: '#/components/schemas/ExpirationDate'
+        type:
+          $ref: '#/components/schemas/Type'
+        status:
+          $ref: '#/components/schemas/Status'
+      required:
+      - taxCode
+      - status
+      example:
+        taxCode: "CHCZLN73D08A662B"
+        status: "V"
+  
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: This API uses API key
+      name: X-API-Key
+      in: header

@@ -1,0 +1,721 @@
+openapi: 3.0.3
+
+info:
+  title: Payment Notice Microservice
+  version: 1.0.0
+  description: Payment Notice Microservice for Multi-channel Integration Layer of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+- description: Payment Notice URL
+  url: https://server_addr
+
+security: 
+- ApiKeyAuth: []
+
+paths:
+  /paymentNotices/{qrCode}:
+    # ------------------------------------------------------
+    # Verify a payment notice by QR-code
+    # ------------------------------------------------------
+    get:
+      operationId: verifyByQrCode
+      summary: Verify a payment notice by QR-code
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/Channel'
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/TerminalId'
+      - name: qrCode
+        description: String encoded by the QR-code
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/QrCode'
+      responses:
+        "200":
+          description: Verify processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Payment notice not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+          
+    # ------------------------------------------------------
+    # Activate the payment of a notice by QR-code **TO COMPLETE**
+    # ------------------------------------------------------
+    patch:
+      operationId: activateByQrCode
+      summary: Activate the payment of a notice by QR-code
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/Channel'
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/TerminalId'
+      - name: qrCode
+        description: String encoded by the QR-code
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/QrCode'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivateReq'
+      responses:
+        "202":
+          description: Request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivateRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Payment notice not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "415":
+          description: Unsupported media type. Did you provide application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+  /paymentNotices/{paTaxCode}/{noticeNumber}:
+    # ------------------------------------------------------
+    # Verify a payment notice by PA tax code and notice
+    # number
+    # ------------------------------------------------------
+    get:
+      operationId: verifyByTaxCodeAndNoticeNumber
+      summary: Verify a payment notice by PA tax code and notice number
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/Channel'
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/TerminalId'
+      - name: paTaxCode
+        description: Tax code of the creditor company
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PaTaxCode'
+      - name: noticeNumber
+        description: Notice number
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NoticeNumber'
+      responses:
+        "200":
+          description: Verify processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Payment notice not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+    # ------------------------------------------------------
+    # Activate the payment of a notice by PA tax code and
+    # notice number **TO COMPLETE**
+    # ------------------------------------------------------
+    patch:
+      operationId: activateByTaxCodeAndNoticeNumber
+      summary: Activate the payment of a notice by PA tax code and notice number
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/Channel'
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/TerminalId'
+      - name: paTaxCode
+        description: Tax code of the creditor company
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/PaTaxCode'
+      - name: noticeNumber
+        description: Notice number
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/NoticeNumber'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivateReq'
+      responses:
+        "202":
+          description: Request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivateRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Payment notice not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "415":
+          description: Unsupported media type. Did you provide application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+  /fees:
+    # ------------------------------------------------------
+    # Calculate the fee amount for a set of payment notices **TO COMPLETE**
+    # ------------------------------------------------------
+    post:
+      operationId: getFee
+      summary: Calculate the fee amount for a set of payment notices
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/Channel'
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/TerminalId'
+
+  /payments:
+    # ------------------------------------------------------
+    # Close the payment of a set of notices **TO COMPLETE**
+    # ------------------------------------------------------
+    patch:
+      operationId: close
+      summary: Close the payment of a set of notices
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/Channel'
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/TerminalId'
+
+  /payments/{transactionId}:
+    # ------------------------------------------------------
+    # Receive from the Nodo the result of the payment of a
+    # set of payment notices
+    # ------------------------------------------------------
+    post:
+      operationId: receivePaymentStatus
+      summary: Receive from the Nodo the result of the payment of a set of payment notices
+      parameters:
+      - name: transactionId
+        description: Transaction ID
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TransactionId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentStatus'
+        "200":
+          description: Request processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceivePaymentStatusOkRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceivePaymentStatusTrxNotFoundRes'
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "415":
+          description: Unsupported media type. Did you provide application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+    # ------------------------------------------------------
+    # Retrieve the status of the payment of a set of payment
+    # notices
+    # ------------------------------------------------------
+    get:
+      operationId: getPaymentStatus
+      summary: Retrieve the status of the payment of a set of payment notices
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/Channel'
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/TerminalId'
+      - name: transactionId
+        description: Transaction ID
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/TransactionId'
+      responses:
+        "200":
+          description: Payment status received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStatus'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Payment status not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+components:
+  schemas:
+    # ------------------------------------------------------
+    # Basic types
+    # ------------------------------------------------------
+    Company:
+      description: Name of the creditor company
+      type: string
+      pattern: "^[ -~]{1,140}$"
+      example: "ACI"
+
+    CreditorReferenceId:
+      description: ID for the creditor company
+      type: string
+      pattern: "^[ -~]{1,35}$"
+      example: "4839d50603fssfW5X"
+
+    Debtor:
+      description: Debtor unstructured data
+      type: string
+      pattern: "^[ -~]{0,1024}$"
+      example: "Mario Rossi"
+
+    Description:
+      description: Payment notice description
+      type: string
+      pattern: "^[ -~]{1,140}$"
+      example: "Health ticket for chest x-ray"
+
+    DueDate:
+      description: Expiration date of the payment notice
+      type: string
+      format: date
+      example: "2022-11-30"
+
+    EuroCents:
+      description: Amount in euro cents
+      type: number
+      format: int64
+      minimum: 1
+      maximum: 99999999999
+      
+    Note:
+      description: Payment notice note
+      type: string
+      pattern: "^[ -~]{1,210}$"
+      example: "This is a payment notice"
+    
+    NoticeNumber:
+      description: Notice number
+      type: string
+      pattern: "^[0-9]{18}$"
+      example: "485564829563528563"
+
+    Office:
+      description: Name of the creditor company office
+      type: string
+      pattern: "^[ -~]{1,140}$"
+      example: "Ufficio di Roma"
+
+    OkOutcome:
+      description: Constant value (OK) outcome
+      enum:
+      - OK
+      type: string
+      example: "OK"
+
+    AllOrNothingOutcome:
+      description: Dual values (OK or KO) outcome
+      type: string
+      enum:
+      - OK
+      - KO
+      example: "OK"
+
+    KoOutcome:
+      description: Outcome returned to verify and activate operations when something went wrong
+      type: string
+      enum:
+      - NOTICE_GLITCH               # Spiacenti, c'è un problema tecnico con questo avviso.
+      - WRONG_NOTICE_DATA           # Spiacenti, i dati dell’avviso non sono corretti.
+      - CREDITOR_PROBLEMS           # Spiacenti, l’Ente Creditore sta avendo problemi nella risposta.
+      - PAYMENT_ALREADY_IN_PROGRESS # Il pagamento è già in corso, riprova fra qualche minuto.
+      - EXPIRED_NOTICE              # Spiacenti, l’avviso è scaduto e non è più possibile pagarlo.
+      - REVOKED_NOTICE              # Spiacenti, l’Ente Creditore ha revocato questo avviso.
+      - NOTICE_ALREADY_PAID         # Questo avviso è stato già pagato!
+      - UNEXPECTED_ERROR            # Spiacenti, si è verificato un errore imprevisto.
+      example: "NOTICE_GLITCH"
+
+    PaTaxCode:
+      description: Tax code of the creditor company
+      type: string
+      pattern: "^[0-9]{11}$"
+      example: "15376371009"
+
+    PaymentToken:
+      description: ID of the payment activation
+      type: string
+      pattern: "^[ -~]{1,35}$"
+      example: "648fhg36s95jfg7DS"
+
+    QrCode:
+      description: String encoded by the pagoPA QR-code
+      type: string
+      pattern: "^[ -~]{6}\\|[ -~]{3}\\|[0-9]{18}\\|[0-9]{11}\\|[0-9]{2,11}$"
+      example: "PAGOPA|002|000000000000000000|00000000000|9999"
+    
+    TransactionId:
+      description: Transaction ID
+      type: string
+      pattern: "^[a-zA-Z0-9]{1,255}$"
+      example: "517a4216840E461fB011036A0fd134E1"
+
+    TrxNotFoundOutcome:
+      description: Constant value (PAYMENT_NOT_FOUND) outcome
+      enum:
+      - PAYMENT_NOT_FOUND
+      type: string
+      example: "PAYMENT_NOT_FOUND"
+
+    # ------------------------------------------------------
+    # Common complex types
+    # ------------------------------------------------------
+    PaymentStatus:
+      description: Payment status communicated by the Nodo
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/AllOrNothingOutcome'
+        paymentDate:
+          description: Notification timestamp
+          type: string
+          format: date-time
+        payments:
+          description: Details of payment notices
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/PaymentDetails'
+      required:
+      - outcome
+      - paymentDate
+      - payments
+      example:
+        
+    PaymentDetails:
+      description: Details of a payment notice
+      type: object
+      additionalProperties: false
+      properties:
+        paymentToken:
+          $ref: '#/components/schemas/PaymentToken'
+        description:
+          $ref: '#/components/schemas/Description'
+        creditorReferenceId:
+          $ref: '#/components/schemas/CreditorReferenceId'
+        paTaxCode:
+          $ref: '#/components/schemas/PaTaxCode'
+        company:
+          $ref: '#/components/schemas/Company'
+        office:
+          $ref: '#/components/schemas/Office'
+        debtor:
+          $ref: '#/components/schemas/Debtor' 
+      required:
+
+    # ------------------------------------------------------
+    # Complex types for verifyByQrCode and
+    # verifyByTaxCodeAndNoticeNumber
+    # ------------------------------------------------------
+    VerifyRes:
+      description: Response returned when the session is found
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/VerifyOkRes'
+      - $ref: '#/components/schemas/VerifyKoRes'
+    
+    VerifyOkRes:
+      description: Response for verify request when all went ok
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/OkOutcome'
+        amount:
+          $ref: '#/components/schemas/EuroCents'
+        dueDate:
+          $ref: '#/components/schemas/DueDate'
+        note:
+          $ref: '#/components/schemas/Note'
+        description:
+          $ref: '#/components/schemas/Description'
+        company:
+          $ref: '#/components/schemas/Company'
+        office:
+          $ref: '#/components/schemas/Office'
+      required:
+      - outcome
+      - amount
+      example:
+        outcome: "OK"
+        amount: 12345
+
+    VerifyKoRes:
+      description: Response for verify request when something went wrong
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/KoOutcome'
+      required:
+      - outcome
+      example:
+        outcome: "NOTICE_GLITCH"
+    
+    # ------------------------------------------------------
+    # Complex types for receivePaymentStatus
+    # ------------------------------------------------------
+    ReceivePaymentStatusOkRes:
+      description: Response returned when the payment status notification has been successfully processed
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/OkOutcome'
+      required:
+      - outcome
+      example:
+        outcome: "OK"
+
+    ReceivePaymentStatusTrxNotFoundRes:
+      description: Response returned when the transaction ID communicated with the payment status notification has not been found
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/TrxNotFoundOutcome'
+      required:
+      - outcome
+      example:
+        outcome: "PAYMENT_NOT_FOUND"
+    
+  # ------------------------------------------------------
+  # Security
+  # ------------------------------------------------------
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: This API uses API key
+      name: Ocp-Apim-Subscription-Key
+      in: header

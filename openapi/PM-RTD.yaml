@@ -1,0 +1,174 @@
+openapi: 3.0.3
+
+info:
+  title: PAN-to-Token Service and viceversa
+  version: 3.0.0
+  description: Service to create or retrieve, if it already exists, the token of a given PAN and viceversa
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+- description: PAN-to-Token Service URL
+  url: https://server_addr
+
+security: 
+- ApiKeyAuth: []
+
+paths:
+  /tokens:
+    # ------------------------------------------------------
+    # Create or retrieve, if it already exists, the token of
+    # a given PAN.
+    # ------------------------------------------------------
+    post:
+      operationId: retrieveToken
+      summary: Create or retrieve, if it already exists, the token of a given PAN
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer' 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetrieveTokenReq'
+      responses:
+        "200":
+          description: Token retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTokenRes'
+        "201":
+          description: Token created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTokenRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "415":
+          description: Unsupported media type. Did you provide application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+  /pans/{token}:
+    # ------------------------------------------------------
+    # Retrieves the PAN of a given token.
+    # ------------------------------------------------------
+    get:
+      operationId: getPan
+      summary: Retrieve the PAN of a given token
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer' 
+      - name: token
+        description: Token
+        in: path
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/PanToken'
+      responses:
+        "200":
+          description: PAN retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPanRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: PAN not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+components:
+  schemas:
+    # ------------------------------------------------------
+    # Basic types
+    # ------------------------------------------------------
+    Pan:
+      description: Payment card's PAN
+      type: string
+      pattern: "^\\d{16,19}$"
+      example: "4769328596019370"
+    
+    # ------------------------------------------------------
+    # Complex types for retrieveToken
+    # ------------------------------------------------------
+    RetrieveTokenReq:
+      description: Request to create or retrieve the token of a PAN
+      type: object
+      additionalProperties: false
+      properties:
+        pan:
+          $ref: '#/components/schemas/Pan'
+      required:
+      - pan
+      example:
+        pan: "4769328596019370"
+    
+    RetrieveTokenRes:
+      description: Response when all went ok and the token is successfully created or retrieved
+      type: object
+      additionalProperties: false
+      properties:
+        token:
+          $ref: 'common.yaml#/components/schemas/PanToken'
+      required:
+      - token
+      example:
+        token: "517a4216840E461fB011036A0fd134E1"
+    
+    # ------------------------------------------------------
+    # Complex types for getPan
+    # ------------------------------------------------------
+    GetPanRes:
+      description: Response when all went ok and the PAN is successfully retrieved
+      type: object
+      additionalProperties: false
+      properties:
+        pan:
+          $ref: '#/components/schemas/Pan'
+      required:
+      - pan
+      example:
+        pan: "4769328596019370"
+
+  # ------------------------------------------------------
+  # Security
+  # ------------------------------------------------------
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: This API uses API key
+      name: X-API-Key
+      in: header

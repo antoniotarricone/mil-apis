@@ -1,0 +1,80 @@
+openapi: 3.0.3
+
+info:
+  title: Common schemas
+  version: 1.0.0
+  description: Common schemas for Multi-channel Integration Layer of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+
+security: 
+
+paths:
+
+components:
+  schemas:
+    # ------------------------------------------------------
+    # Basic types
+    # ------------------------------------------------------
+    AcquirerId:
+      description: Acquiring Institution Identification Code
+      type: string
+      pattern: "^\\d{1,11}$"
+      example: "4585625"
+
+    Channel:
+      enum:
+      - ATM
+      - POS
+      - TOTEM
+      - CASH_REGISTER
+      - CSA
+      type: string
+
+    PanToken:
+      description: The token of the PAN
+      type: string
+      pattern: "^[a-zA-Z0-9]{1,32}$"
+      example: "517a4216840E461fB011036A0fd134E1"
+
+    PositiveInteger:
+      description: Non negative integer
+      type: number
+      minimum: 1
+
+    SemVer:
+      description: Semantic version
+      type: string
+      pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+      maxLength: 64
+      example: "1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay"
+
+    TaxCode:
+      description: Tax code of the payment card owner
+      type: string
+      pattern: "^([A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z])|(\\d{11})$"
+      example: "CHCZLN73D08A662B"
+
+    TerminalId:
+      description: Terminal Identification
+      type: string
+      pattern: "^[0-9a-zA-Z]{8}$"
+      example: "0aB9wXyZ"
+      
+    URI:
+      description: URI
+      type: string
+      format: uri
+      pattern: "^[ -~]{1,2048}$"
+
+    UUID:
+      description: UUID
+      type: string
+      format: uuid
+      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      example: "d0d654e6-97da-4848-b568-99fedccb642b"
+
+  securitySchemes:

@@ -1,0 +1,208 @@
+openapi: 3.0.3
+
+info:
+  title: PM-Wallet Service
+  version: 4.0.0
+  description: Service to handle payment cards Wallet in the PagoPA Ecosystem
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+- description: PM-Wallet Service URL
+  url: https://server_addr
+
+security: 
+- ApiKeyAuth: []
+
+paths:
+  /cards/{token}/taxCode:
+    # ------------------------------------------------------
+    # Retrieve the tax code of the owner of the payment card
+    # that has the PAN linked to the given token.
+    # ------------------------------------------------------
+    get:
+      operationId: retrieveTaxCode
+      summary: Retrieve the tax code of the owner of the payment card that has the PAN linked to the given token
+      description: Retrieve the tax code by querying internal DB or invoking Bancomat, Nexi, SIA, Intesa Sanpaolo, Poste Italiane or ICCREA service. 
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: token
+        description: Token
+        in: path
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/PanToken'
+      responses:
+        "200":
+          description: Tax code retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveTaxCodeRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Tax code not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+  /cards:
+    # ------------------------------------------------------
+    # Retrieve the tax code of the owner of the payment card
+    # that has the PAN linked to the given token.
+    # ------------------------------------------------------
+    post:
+      operationId: presave
+      summary: Pre-save a payment card in the Wallet
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PresavePaymentCardReq'
+      responses:
+        "204":
+          description: Ack
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "415":
+          description: Unsupported media type. Did you provide application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+  /enabledServices/{taxCode}/saveNewCards:
+    # ------------------------------------------------------
+    # Get the value of the flag "save new cards".
+    # ------------------------------------------------------
+    get:
+      operationId: getSaveNewCardsFlag
+      summary: Get the value of the flag "save new cards"
+      parameters:
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          $ref: 'common.yaml#/components/schemas/SemVer'
+      - name: taxCode
+        description: Tax code
+        in: path
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/TaxCode'
+      responses:
+        "200":
+          description: Flag retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetSaveNewCardsFlagRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Tax code not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+components:
+  schemas:
+    # ------------------------------------------------------
+    # Complex types for retrieveTaxCode
+    # ------------------------------------------------------
+    RetrieveTaxCodeRes:
+      description: Response when all went ok and the tax code is successfully retrieved
+      type: object
+      additionalProperties: false
+      properties:
+        taxCode:
+          $ref: 'common.yaml#/components/schemas/TaxCode'
+      required:
+      - taxCode
+      example:
+        taxCode: "CHCZLN73D08A662B"
+    
+    # ------------------------------------------------------
+    # Complex types for presave
+    # ------------------------------------------------------
+    PresavePaymentCardReq:
+      description: Request to store the tax code of the owner of the payment card that has the PAN linked to the given token
+      type: object
+      additionalProperties: false
+      properties:
+        token:
+          $ref: 'common.yaml#/components/schemas/PanToken'
+        taxCode:
+          $ref: 'common.yaml#/components/schemas/TaxCode'
+      required:
+      - token
+      - taxCode
+      example:
+        token: "517a4216840E461fB011036A0fd134E1"
+        taxCode: "CHCZLN73D08A662B"
+
+    # ------------------------------------------------------
+    # Complex types for getSaveNewCardsFlag
+    # ------------------------------------------------------
+    GetSaveNewCardsFlagRes:
+      description: Response when all went ok and the value of the flag "save new cards" is successfully retrieved
+      type: object
+      additionalProperties: false
+      properties:
+        saveNewCards:
+          type: boolean
+      required:
+      - saveNewCards
+      example:
+        saveNewCards: true
+
+  # ------------------------------------------------------
+  # Security
+  # ------------------------------------------------------
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: This API uses API key
+      name: X-API-Key
+      in: header
