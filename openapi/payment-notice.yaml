@@ -472,6 +472,14 @@ components:
     # ------------------------------------------------------
     # Basic types
     # ------------------------------------------------------
+    AllOrNothingOutcome:
+      description: Dual values (OK or KO) outcome
+      type: string
+      enum:
+      - OK
+      - KO
+      example: "OK"
+
     Category:
       description: Transfer category
       type: string
@@ -544,14 +552,6 @@ components:
       enum:
       - OK
       type: string
-      example: "OK"
-
-    AllOrNothingOutcome:
-      description: Dual values (OK or KO) outcome
-      type: string
-      enum:
-      - OK
-      - KO
       example: "OK"
 
     KoOutcome:
