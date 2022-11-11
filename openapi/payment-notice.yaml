@@ -79,7 +79,7 @@ paths:
           description: Unexpected error
           
     # ------------------------------------------------------
-    # Activate the payment of a notice by QR-code **TO COMPLETE**
+    # Activate the payment of a notice by QR-code
     # ------------------------------------------------------
     patch:
       operationId: activateByQrCode
@@ -217,7 +217,7 @@ paths:
 
     # ------------------------------------------------------
     # Activate the payment of a notice by PA tax code and
-    # notice number **TO COMPLETE**
+    # notice number
     # ------------------------------------------------------
     patch:
       operationId: activateByTaxCodeAndNoticeNumber
@@ -472,6 +472,12 @@ components:
     # ------------------------------------------------------
     # Basic types
     # ------------------------------------------------------
+    Category:
+      description: Transfer category
+      type: string
+      pattern: "^[ -~]{0,1024}$"
+      example: "KTM"
+
     Company:
       description: Name of the creditor company
       type: string
@@ -508,7 +514,13 @@ components:
       format: int64
       minimum: 1
       maximum: 99999999999
-      
+
+    IdempotencyKey:
+      description: Idempotency key for activate request
+      type: string
+      pattern: "^[0-9]{11}_[a-zA-Z0-9]{10}$"
+      example: "47583764545_Ahf479elk0"
+
     Note:
       description: Payment notice note
       type: string
@@ -634,21 +646,47 @@ components:
           $ref: '#/components/schemas/Debtor' 
       required:
 
+    Transfer:
+      description:
+      type: object
+      additionalProperties: false
+      properties:
+        paTaxCode:
+          $ref: '#/components/schemas/PaTaxCode'
+        category:
+          $ref: '#/components/schemas/Category'
+      required:
+      - paTaxCode
+      - category
+      example:
+        paTaxCode: "15376371009"
+        category: "KTM"
+
+    VerifyOrActivateKoRes:
+      description: Response to verify or activate payment notice when something went wrong
+      type: object
+      properties:
+        outcome:
+          $ref: '#/components/schemas/KoOutcome'
+      required:
+      - outcome
+      example:
+        outcome: "NOTICE_GLITCH"
+
     # ------------------------------------------------------
     # Complex types for verifyByQrCode and
     # verifyByTaxCodeAndNoticeNumber
     # ------------------------------------------------------
     VerifyRes:
-      description: Response returned when the session is found
+      description: Response to verify payment notice when it is found
       type: object
       oneOf:
       - $ref: '#/components/schemas/VerifyOkRes'
-      - $ref: '#/components/schemas/VerifyKoRes'
+      - $ref: '#/components/schemas/VerifyOrActivateKoRes'
     
     VerifyOkRes:
-      description: Response for verify request when all went ok
+      description: Response to verify payment notice when all went ok
       type: object
-      additionalProperties: false
       properties:
         outcome:
           $ref: '#/components/schemas/OkOutcome'
@@ -671,18 +709,51 @@ components:
         outcome: "OK"
         amount: 12345
 
-    VerifyKoRes:
-      description: Response for verify request when something went wrong
+    # ------------------------------------------------------
+    # Complex types for activateByQrCode and
+    # activateByTaxCodeAndNoticeNumber
+    # ------------------------------------------------------
+    ActivateReq:
+      description: Request to activate payment notice
       type: object
       additionalProperties: false
       properties:
-        outcome:
-          $ref: '#/components/schemas/KoOutcome'
+        idempotencyKey:
+          $ref: '#/components/schemas/IdempotencyKey'
+        amount:
+          $ref: '#/components/schemas/EuroCents'
       required:
-      - outcome
+      - idempotencyKey
+      - amount
       example:
-        outcome: "NOTICE_GLITCH"
+        idempotencyKey: "NOTICE_GLITCH"
+        amount: 12345
     
+    ActivateRes:
+      description: Response to activate payment notice when it is found
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/ActivateOkRes'
+      - $ref: '#/components/schemas/VerifyOrActivateKoRes'
+
+    ActivateOkRes:
+      description: Response to activate payment notice when all went ok
+      type: object
+      properties:
+        outcome:
+          $ref: '#/components/schemas/OkOutcome'
+        amount:
+          $ref: '#/components/schemas/EuroCents'
+        paTaxCode:
+          $ref: '#/components/schemas/PaTaxCode'
+        paymentToken:
+          $ref: '#/components/schemas/PaymentToken'
+        transfers:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/Transfer'
+
     # ------------------------------------------------------
     # Complex types for receivePaymentStatus
     # ------------------------------------------------------

@@ -1,9 +1,9 @@
 openapi: 3.0.3
 
 info:
-  title: Session Management Microservice
+  title: Session Microservice
   version: 2.0.0
-  description: Session Management Microservice for Multi-channel Integration Layer of SW Client Project
+  description: Session Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
