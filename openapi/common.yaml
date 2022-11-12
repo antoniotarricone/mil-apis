@@ -42,7 +42,7 @@ components:
 
     PositiveInteger:
       description: Non negative integer
-      type: number
+      type: integer
       minimum: 1
 
     SemVer:

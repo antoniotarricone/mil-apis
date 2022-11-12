@@ -292,7 +292,7 @@ paths:
 
   /fees:
     # ------------------------------------------------------
-    # Calculate the fee amount for a set of payment notices **TO COMPLETE**
+    # Calculate the fee amount for a set of payment notices
     # ------------------------------------------------------
     post:
       operationId: getFee
@@ -322,10 +322,40 @@ paths:
         required: true
         schema:
           $ref: 'common.yaml#/components/schemas/TerminalId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetFeeReq'
+      responses:
+        "200":
+          description: Fee found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFeeRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Fee not found
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "415":
+          description: Unsupported media type. Did you provide application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
 
   /payments:
     # ------------------------------------------------------
-    # Close the payment of a set of notices **TO COMPLETE**
+    # Close the payment of a set of notices
     # ------------------------------------------------------
     patch:
       operationId: close
@@ -355,6 +385,34 @@ paths:
         required: true
         schema:
           $ref: 'common.yaml#/components/schemas/TerminalId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloseReq'
+      responses:
+        "200":
+          description: Request processed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloseRes'
+        "400":
+          description: Bad request
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/xml?
+        "415":
+          description: Unsupported media type. Did you provide application/xml?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
 
   /payments/{transactionId}:
     # ------------------------------------------------------
@@ -376,6 +434,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PaymentStatus'
+      responses:
         "200":
           description: Request processed
           content:
@@ -490,7 +549,7 @@ components:
       description: Name of the creditor company
       type: string
       pattern: "^[ -~]{1,140}$"
-      example: "ACI"
+      example: "ASL Roma"
 
     CreditorReferenceId:
       description: ID for the creditor company
@@ -514,14 +573,16 @@ components:
       description: Expiration date of the payment notice
       type: string
       format: date
+      maxLength: 10
       example: "2022-11-30"
 
     EuroCents:
       description: Amount in euro cents
-      type: number
+      type: integer
       format: int64
       minimum: 1
       maximum: 99999999999
+      example: 12345
 
     IdempotencyKey:
       description: Idempotency key for activate request
@@ -574,6 +635,17 @@ components:
       pattern: "^[0-9]{11}$"
       example: "15376371009"
 
+    PaymentMethod:
+      description: Method used to pay notice/s
+      type: string
+      enum:
+      - PAGOBANCOMAT
+      - DEBIT_CARD
+      - CREDIT_CARD
+      - BANK_ACCOUNT
+      - CASH
+      example: "PAGOBANCOMAT"
+
     PaymentToken:
       description: ID of the payment activation
       type: string
@@ -594,9 +666,9 @@ components:
 
     TrxNotFoundOutcome:
       description: Constant value (PAYMENT_NOT_FOUND) outcome
+      type: string
       enum:
       - PAYMENT_NOT_FOUND
-      type: string
       example: "PAYMENT_NOT_FOUND"
 
     # ------------------------------------------------------
@@ -613,6 +685,7 @@ components:
           description: Notification timestamp
           type: string
           format: date-time
+          maxLength: 19
         payments:
           description: Details of payment notices
           type: array
@@ -624,6 +697,16 @@ components:
       - paymentDate
       - payments
       example:
+        outcome: "OK"
+        paymentDate: "2022-11-12T08:53:55"
+        payments:
+          - paymentToken: "648fhg36s95jfg7DS"
+            description: "Health ticket for chest x-ray"
+            creditorReferenceId: "4839d50603fssfW5X"
+            paTaxCode: "15376371009"
+            company: "ASL Roma"
+            office: "Ufficio di Roma"
+            debtor: "Mario Rossi"
         
     PaymentDetails:
       description: Details of a payment notice
@@ -645,6 +728,14 @@ components:
         debtor:
           $ref: '#/components/schemas/Debtor' 
       required:
+      example:
+        paymentToken: "648fhg36s95jfg7DS"
+        description: "Health ticket for chest x-ray"
+        creditorReferenceId: "4839d50603fssfW5X"
+        paTaxCode: "15376371009"
+        company: "ASL Roma"
+        office: "Ufficio di Roma"
+        debtor: "Mario Rossi"
 
     Transfer:
       description:
@@ -679,7 +770,6 @@ components:
     # ------------------------------------------------------
     VerifyRes:
       description: Response to verify payment notice when it is found
-      type: object
       oneOf:
       - $ref: '#/components/schemas/VerifyOkRes'
       - $ref: '#/components/schemas/VerifyOrActivateKoRes'
@@ -726,12 +816,11 @@ components:
       - idempotencyKey
       - amount
       example:
-        idempotencyKey: "NOTICE_GLITCH"
+        idempotencyKey: "47583764545_Ahf479elk0"
         amount: 12345
     
     ActivateRes:
       description: Response to activate payment notice when it is found
-      type: object
       oneOf:
       - $ref: '#/components/schemas/ActivateOkRes'
       - $ref: '#/components/schemas/VerifyOrActivateKoRes'
@@ -753,6 +842,138 @@ components:
           maxItems: 5
           items:
             $ref: '#/components/schemas/Transfer'
+      required:
+      - paymentToken
+      example:
+        outcome: "OK"
+        amount: 12345
+        paTaxCode: "15376371009"
+        paymentToken: "648fhg36s95jfg7DS"
+        transfers:
+          - paTaxCode: "15376371009"
+            category: "KTM"
+
+    # ------------------------------------------------------
+    # Complex types for getFee
+    # ------------------------------------------------------
+    PaymentNotice:
+      description: Payment notice data
+      type: object
+      additionalProperties: false
+      properties:
+        amount:
+           $ref: '#/components/schemas/EuroCents'
+        paTaxCode:
+           $ref: '#/components/schemas/PaTaxCode'
+        transfers:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/Transfer'
+      required:
+      - amount
+      - paTaxCode
+      - transfers
+      example:
+        amount: 12345
+        paTaxCode: "15376371009"
+        transfers:
+          - paTaxCode: "15376371009"
+            category: "KTM"
+
+    GetFeeReq:
+      description: Request to get fee
+      type: object
+      additionalProperties: false
+      properties:
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        notices:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/PaymentNotice'
+      required:
+      - paymentMethod
+      - notices
+      example:
+        paymentMethod: "PAGOBANCOMAT"
+        notices:
+          - amount: 12345
+            paTaxCode: "15376371009"
+            transfers:
+              - paTaxCode: "15376371009"
+                category: "KTM"
+
+    GetFeeRes:
+      description: Response to get fee when all went ok
+      type: object
+      additionalProperties: false
+      properties:
+        fee:
+          $ref: '#/components/schemas/EuroCents'
+      required:
+      - fee
+      example:
+        fee: 50
+
+    # ------------------------------------------------------
+    # Complex types for close
+    # ------------------------------------------------------
+    CloseReq:
+      description: Request to close transaction
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/AllOrNothingOutcome'
+        paymentTokens:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/PaymentToken'
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+        transactionId:
+          $ref: '#/components/schemas/TransactionId'
+        totalAmount:
+          $ref: '#/components/schemas/EuroCents'
+        fee:
+          $ref: '#/components/schemas/EuroCents'
+        timestampOp:
+          description: Timestamp of e-money transaction
+          type: string
+          format: date-time
+          maxLength: 19
+      required:
+      - outcome
+      - paymentTokens
+      - paymentMethod
+      - transactionId
+      - totalAmount
+      - fee
+      - timestampOp
+      example:
+        outcome: "OK"
+        paymentTokens:
+          - "648fhg36s95jfg7DS"
+        paymentMethod: "PAGOBANCOMAT"
+        transactionId: "517a4216840E461fB011036A0fd134E1"
+        totalAmount: 12345
+        fee: 50
+        timestampOp: "2022-11-12T08:53:55"
+    
+    CloseRes:
+      description: Response to close transaction
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/AllOrNothingOutcome'
+      required:
+      - outcome
+      example:
+        outcome: "OK"
 
     # ------------------------------------------------------
     # Complex types for receivePaymentStatus
