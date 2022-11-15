@@ -1,38 +1,24 @@
-openapi: 3.0.3
-
 info:
-  title: Common schemas
-  version: 1.0.0
-  description: Common schemas for Multi-channel Integration Layer of SW Client Project
+  title: Common components
+  version: 2.0.0
+  description: Common components for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
 
-servers:
-
-security: 
-
-paths:
-
 components:
+  # ========================================================
+  # Schemas
+  # ========================================================
   schemas:
     # ------------------------------------------------------
     # Basic types
     # ------------------------------------------------------
-    AcquirerId:
-      description: Acquiring Institution Identification Code
+    Message:
+      description: Generic message containing XML 1.1 allowed characters
       type: string
-      pattern: "^\\d{1,11}$"
-      example: "4585625"
-
-    Channel:
-      enum:
-      - ATM
-      - POS
-      - TOTEM
-      - CASH_REGISTER
-      - CSA
-      type: string
+      pattern: "^[\u0001-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]{1,256}$"
+      example: "Session has not yet been created"
 
     PanToken:
       description: The token of the PAN
@@ -44,13 +30,7 @@ components:
       description: Non negative integer
       type: integer
       minimum: 1
-
-    SemVer:
-      description: Semantic version
-      type: string
-      pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
-      maxLength: 64
-      example: "1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay"
+      example: 234
 
     TaxCode:
       description: Tax code of the payment card owner
@@ -58,12 +38,6 @@ components:
       pattern: "^([A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z])|(\\d{11})$"
       example: "CHCZLN73D08A662B"
 
-    TerminalId:
-      description: Terminal Identification
-      type: string
-      pattern: "^[0-9a-zA-Z]{8}$"
-      example: "0aB9wXyZ"
-      
     URI:
       description: URI
       type: string
@@ -77,4 +51,113 @@ components:
       pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
       example: "d0d654e6-97da-4848-b568-99fedccb642b"
 
+    # ------------------------------------------------------
+    # Complex types
+    # ------------------------------------------------------
+    MessageObject:
+      description: Object of generic message containing XML 1.1 allowed characters
+      type: object
+      additionalProperties: false
+      properties:
+        message:
+          $ref: '#/components/schemas/Message'
+      required:
+        - message
+      example:
+        message: "Terms and conditions has not yet been accepted"
+
+    Violations:
+      description: List of violations
+      type: object
+      additionalProperties: false
+      properties:
+        violations:
+          type: array
+          maxItems: 32
+          items:
+            $ref: '#/components/schemas/MessageObject'
+      required:
+        - violations
+      example:
+        violations:
+          - message: "AcquirerId cannot be null"
+          - message: "Channel not allowed"
+
+  # ========================================================
+  # Parameters
+  # ========================================================
+  parameters:
+    Version:
+      name: Version
+      in: header
+      description: Version of the required API
+      required: false
+      schema:
+        type: string
+        pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+        maxLength: 64
+        example: "1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay"
+
+    AcquirerId:
+      name: AcquirerId
+      in: header
+      description: Acquirer ID assigned by PagoPA
+      required: true
+      schema:
+        type: string
+        pattern: "^\\d{1,11}$"
+        example: "4585625"
+
+    Channel:
+      name: Channel
+      in: header
+      description: Channel originating the request
+      required: true
+      schema:
+        enum:
+          - ATM
+          - POS
+          - TOTEM
+          - CASH_REGISTER
+          - CSA
+        type: string
+        example: "ATM"
+
+    SessionId:
+      name: id
+      description: Session ID
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+
+    TerminalId:
+      name: TerminalId
+      in: header
+      description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+      required: true
+      schema:
+        type: string
+        pattern: "^[0-9a-zA-Z]{8}$"
+        example: "0aB9wXyZ"
+
+  # ========================================================
+  # Responses
+  # ========================================================
+  responses:
+    ConstraintViolation:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Violations'
+
+  # ========================================================
+  # Security schemes
+  # ========================================================
   securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: This API uses API key
+      name: Ocp-Apim-Subscription-Key
+      in: header

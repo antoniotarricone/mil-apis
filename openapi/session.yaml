@@ -2,18 +2,18 @@ openapi: 3.0.3
 
 info:
   title: Session Microservice
-  version: 2.0.0
+  version: 3.0.0
   description: Session Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
 
 servers:
-- description: Session Manager URL
-  url: https://server_addr
+  - description: Session Manager URL
+    url: https://server_addr
 
-security: 
-- ApiKeyAuth: []
+security:
+  - ApiKeyAuth: [ ]
 
 paths:
   /sessions/{id}:
@@ -24,45 +24,16 @@ paths:
       operationId: getSessionById
       summary: Read a session by ID
       parameters:
-      - name: Version
-        in: header
-        description: Version of the required API
-        required: false
-        schema:
-          $ref: 'common.yaml#/components/schemas/SemVer'
-      - name: AcquirerId
-        in: header
-        description: Acquirer ID assigned by PagoPA
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/AcquirerId'
-      - name: Channel
-        in: header
-        description: Channel originating the request
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/Channel'
-      - name: TerminalId
-        in: header
-        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/TerminalId'
-      - name: id
-        description: Session ID
-        in: path
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/UUID'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+        - $ref: 'common.yaml#/components/parameters/SessionId'
       responses:
         "200":
-          description: Session retrieved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetSessionRes'
+          $ref: '#/components/responses/SessionRetrieved'
         "400":
-          description: Bad request
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
         "401":
           description: API key is missing or invalid
         "403":
@@ -85,41 +56,16 @@ paths:
       operationId: deleteSessionById
       summary: Delete a session by ID
       parameters:
-      - name: Version
-        in: header
-        description: Version of the required API
-        required: false
-        schema:
-          $ref: 'common.yaml#/components/schemas/SemVer'
-      - name: AcquirerId
-        in: header
-        description: Acquirer ID assigned by PagoPA
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/AcquirerId'
-      - name: Channel
-        in: header
-        description: Channel originating the request
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/Channel'
-      - name: TerminalId
-        in: header
-        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/TerminalId'
-      - name: id
-        description: Session ID
-        in: path
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/UUID'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+        - $ref: 'common.yaml#/components/parameters/SessionId'
       responses:
         "204":
           description: Session deleted
         "400":
-          description: Bad request
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
         "401":
           description: API key is missing or invalid
         "403":
@@ -142,50 +88,18 @@ paths:
       operationId: updateSessionById
       summary: Update partially a session by ID
       parameters:
-      - name: Version
-        in: header
-        description: Version of the required API
-        required: false
-        schema:
-          $ref: 'common.yaml#/components/schemas/SemVer'
-      - name: AcquirerId
-        in: header
-        description: Acquirer ID assigned by PagoPA
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/AcquirerId'
-      - name: Channel
-        in: header
-        description: Channel originating the request
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/Channel'
-      - name: TerminalId
-        in: header
-        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/TerminalId'
-      - name: id
-        description: Session ID
-        in: path
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/UUID'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+        - $ref: 'common.yaml#/components/parameters/SessionId'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateSessionReq'
+        $ref: '#/components/requestBodies/UpdateSession'
       responses:
         "202":
-          description: Request accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateSessionRes'
+          $ref: '#/components/responses/UpdateSessionReqAccepted'
         "400":
-          description: Bad request
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
         "401":
           description: API key is missing or invalid
         "403":
@@ -211,72 +125,19 @@ paths:
       operationId: createSession
       summary: Create a session
       parameters:
-      - name: Version
-        in: header
-        description: Version of the required API
-        required: false
-        schema:
-          $ref: 'common.yaml#/components/schemas/SemVer'
-      - name: AcquirerId
-        in: header
-        description: Acquirer ID assigned by PagoPA
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/AcquirerId'
-      - name: Channel
-        in: header
-        description: Channel originating the request
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/Channel'
-      - name: TerminalId
-        in: header
-        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/TerminalId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateSessionReq'
+        $ref: '#/components/requestBodies/CreateSession'
       responses:
         "201":
-          description: Session created
-          headers:
-            Location:
-              description: URL to retrieve the session
-              required: true
-              schema:
-                $ref: 'common.yaml#/components/schemas/URI'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateSessionRes'
+          $ref: '#/components/responses/SessionCreated'
         "202":
-          description: Pairing with IO is required
-          headers:
-            Location:
-              description: URL to check the status of pairing
-              required: true
-              schema:
-                $ref: 'common.yaml#/components/schemas/URI'
-            Retry-After:
-              description: Number of seconds after which to check if pairing has been completed
-              required: true
-              schema:
-                $ref: 'common.yaml#/components/schemas/PositiveInteger'
-            Max-Retries:
-              description: Max number of retries to check if the pairing has been completed
-              required: true
-              schema:
-                $ref: 'common.yaml#/components/schemas/PositiveInteger'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PairWithIORes'
+          $ref: '#/components/responses/PairWithIORequired'
         "400":
-          description: Bad request
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
         "401":
           description: API key is missing or invalid
         "403":
@@ -299,51 +160,21 @@ paths:
       operationId: checkPairingStatus
       summary: Retrieve the pairing status with IO
       parameters:
-      - name: Version
-        in: header
-        description: Version of the required API
-        required: false
-        schema:
-          $ref: 'common.yaml#/components/schemas/SemVer'
-      - name: AcquirerId
-        in: header
-        description: Acquirer ID assigned by PagoPA
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/AcquirerId'
-      - name: Channel
-        in: header
-        description: Channel originating the request
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/Channel'
-      - name: TerminalId
-        in: header
-        description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
-        required: true
-        schema:
-          $ref: 'common.yaml#/components/schemas/TerminalId'
-      - name: pairingToken
-        in: query
-        description: Pairing token
-        required: true
-        schema:
-          $ref: '#/components/schemas/PairingToken'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+        - name: pairingToken
+          in: query
+          description: Pairing token
+          required: true
+          schema:
+            $ref: '#/components/schemas/PairingToken'
       responses:
         "200":
-          description: Pairing completed
-          headers:
-            Location:
-              description: URL to retrieve the session
-              required: true
-              schema:
-                $ref: 'common.yaml#/components/schemas/URI'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateSessionRes'
+          $ref: '#/components/responses/PairingCompleted'
         "400":
-          description: Bad request
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
         "401":
           description: API key is missing or invalid
         "403":
@@ -367,22 +198,14 @@ paths:
       operationId: pair
       summary: Pair the session with IO
       parameters:
-      - name: Version
-        in: header
-        description: Version of the required API
-        required: false
-        schema:
-          $ref: 'common.yaml#/components/schemas/SemVer'
+        - $ref: 'common.yaml#/components/parameters/Version'
       requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PairingReq'
+        $ref: '#/components/requestBodies/Pair'
       responses:
         "204":
           description: Ack
         "400":
-          description: Bad request
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
         "401":
           description: API key is missing or invalid
         "403":
@@ -399,6 +222,9 @@ paths:
           description: Unexpected error
 
 components:
+  # ========================================================
+  # Schemas
+  # ========================================================
   schemas:
     # ------------------------------------------------------
     # Basic types
@@ -406,25 +232,25 @@ components:
     Outcome:
       description: Return codes
       enum:
-      - OK
-      - TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED
+        - OK
+        - TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED
       type: string
       example: "OK"
 
     OutcomeForAccepted:
       description: Return code for accepted request
       enum:
-      - ACCEPTED
+        - ACCEPTED
       type: string
       example: "ACCEPTED"
 
     OutcomeForPairingWithIO:
       description: Return code when pairing with IO is required
       enum:
-      - PAIR_WITH_IO
+        - PAIR_WITH_IO
       type: string
       example: "PAIR_WITH_IO"
-      
+
     PairingToken:
       description: Pairing token to pair the session with IO
       type: string
@@ -432,21 +258,9 @@ components:
       example: "465937"
 
     # ------------------------------------------------------
-    # Complex types for getSessionById
+    # For getSessionById
     # ------------------------------------------------------
-    GetSessionRes:
-      description: Response returned when the session is found
-      type: object
-      oneOf:
-      - $ref: '#/components/schemas/GetSessionOkRes'
-      - $ref: '#/components/schemas/GetSessionTCNotAcceptedRes'
-      discriminator:
-        propertyName: outcome
-        mapping:
-          OK: '#/components/schemas/GetSessionOkRes'
-          TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED: '#/components/schemas/GetSessionTCNotAcceptedRes'
-
-    GetSessionOkRes:
+    GetSessionOk:
       description: Response returned when the session is found and T&C have been accepted
       type: object
       properties:
@@ -457,16 +271,16 @@ components:
         saveNewCards:
           type: boolean
       required:
-      - outcome
-      - taxCode
-      - saveNewCards
+        - outcome
+        - taxCode
+        - saveNewCards
       example:
         outcome: "OK"
         taxCode: "CHCZLN73D08A662B"
         saveNewCards: true
 
-    GetSessionTCNotAcceptedRes:
-      description: Response returned when the session is found but T&Cs have not been accepted 
+    GetSessionTCNotAccepted:
+      description: Response returned when the session is found but T&Cs have not been accepted
       type: object
       properties:
         outcome:
@@ -474,87 +288,50 @@ components:
         taxCode:
           $ref: 'common.yaml#/components/schemas/TaxCode'
       required:
-      - outcome
-      - taxCode
+        - outcome
+        - taxCode
       example:
         outcome: "TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED"
         taxCode: "CHCZLN73D08A662B"
 
     # ------------------------------------------------------
-    # Complex types for updateSessionById
+    # For createSession
     # ------------------------------------------------------
-    UpdateSessionReq:
-      description: Request to update partially a session
-      type: object
-      additionalProperties: false
-      properties:
-        termsAndCondsAccepted:
-          type: boolean
-        saveNewCards:
-          type: boolean
-      required:
-      - termsAndCondsAccepted
-      - saveNewCards
-      example:
-        termsAndCondsAccepted: true
-        saveNewCards: false
-
-    UpdateSessionRes:
-      description: Response returned when the request to update a session has been accepted
-      type: object
-      additionalProperties: false
-      properties:
-        outcome:
-          $ref: '#/components/schemas/OutcomeForAccepted'
-      required:
-      - outcome
-      example:
-        outcome: "ACCEPTED"
-
-    # ------------------------------------------------------
-    # Complex types for createSession
-    # ------------------------------------------------------
-    CreateSessionReq:
-      description: Request to create a new session
-      oneOf:
-      - $ref: '#/components/schemas/CreateSessionByPanTokenReq'
-      - $ref: '#/components/schemas/CreateSessionByTaxCodeReq'
-    
-    CreateSessionByPanTokenReq:
+    CreateSessionByPanToken:
       description: Request to create a new session by PAN token
       type: object
       properties:
         panToken:
           $ref: 'common.yaml#/components/schemas/PanToken'
       required:
-      - panToken
+        - panToken
       example:
         panToken: "517a4216840E461fB011036A0fd134E1"
-    
-    CreateSessionByTaxCodeReq:
+
+    CreateSessionByTaxCode:
       description: Request to create a new session by tax code
       type: object
       properties:
         taxCode:
           $ref: 'common.yaml#/components/schemas/TaxCode'
       required:
-      - taxCode
+        - taxCode
       example:
         taxCode: "CHCZLN73D08A662B"
 
-    CreateSessionRes:
+    CreateSession:
       description: Response to create session request
       type: object
       oneOf:
-      - $ref: '#/components/schemas/CreateSessionOkRes'
-      - $ref: '#/components/schemas/CreateSessionTCNotAcceptedRes'
+        - $ref: '#/components/schemas/CreateSessionOk'
+        - $ref: '#/components/schemas/CreateSessionTCNotAccepted'
       discriminator:
         propertyName: outcome
         mapping:
-          OK: '#/components/schemas/CreateSessionOkRes'
-          TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED: '#/components/schemas/CreateSessionTCNotAcceptedRes'
+          OK: '#/components/schemas/CreateSessionOk'
+          TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED: '#/components/schemas/CreateSessionTCNotAccepted'
 
-    CreateSessionOkRes:
+    CreateSessionOk:
       description: Response to create session request when all went ok
       type: object
       properties:
@@ -563,60 +340,192 @@ components:
         saveNewCards:
           type: boolean
       required:
-      - outcome
+        - outcome
       example:
         outcome: "OK"
         saveNewCards: true
 
-    CreateSessionTCNotAcceptedRes:
+    CreateSessionTCNotAccepted:
       description: Response to create session request returned when T&Cs have not been accepted
       type: object
       properties:
         outcome:
           $ref: '#/components/schemas/Outcome'
       required:
-      - outcome
+        - outcome
       example:
         outcome: "TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED"
 
-    PairWithIORes:
-      description: Response to create session request returned when pairing with IO is required
-      type: object
-      additionalProperties: false
-      properties:
-        outcome:
-          $ref: '#/components/schemas/OutcomeForPairingWithIO'
-        pairingToken:
-          $ref: '#/components/schemas/PairingToken'
-      required:
-      - outcome
-      - pairingToken
-      example:
-        outcome: "PAIR_WITH_IO"
-        pairingToken: "465937"
+  # ========================================================
+  # Request bodies
+  # ========================================================
+  requestBodies:
+    # ------------------------------------------------------
+    # For updateSessionById
+    # ------------------------------------------------------
+    UpdateSession:
+      description: Request to update partially a session
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              termsAndCondsAccepted:
+                type: boolean
+              saveNewCards:
+                type: boolean
+            required:
+              - termsAndCondsAccepted
+              - saveNewCards
+            example:
+              termsAndCondsAccepted: true
+              saveNewCards: false
 
-    PairingReq:
+    # ------------------------------------------------------
+    # For createSession
+    # ------------------------------------------------------
+    CreateSession:
+      description: Request to create a new session
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/CreateSessionByPanToken'
+              - $ref: '#/components/schemas/CreateSessionByTaxCode'
+
+    # ------------------------------------------------------
+    # For pair
+    # ------------------------------------------------------
+    Pair:
       description: Pairing request from IO
-      type: object
-      additionalProperties: false
-      properties:
-        pairingToken:
-          $ref: '#/components/schemas/PairingToken'
-        taxCode:
-          $ref: 'common.yaml#/components/schemas/TaxCode'
-      required:
-      - pairingToken
-      - taxCode
-      example:
-        pairingToken: "465937"
-        taxCode: "CHCZLN73D08A662B"
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              pairingToken:
+                $ref: '#/components/schemas/PairingToken'
+              taxCode:
+                $ref: 'common.yaml#/components/schemas/TaxCode'
+            required:
+              - pairingToken
+              - taxCode
+            example:
+              pairingToken: "465937"
+              taxCode: "CHCZLN73D08A662B"
 
-  # ------------------------------------------------------
-  # Security
-  # ------------------------------------------------------
+  # ========================================================
+  # Responses
+  # ========================================================
+  responses:
+    # ------------------------------------------------------
+    # For getSessionById
+    # ------------------------------------------------------
+    SessionRetrieved:
+      description: Session retrieved
+      content:
+        application/json:
+          schema:
+            type: object
+            oneOf:
+              - $ref: '#/components/schemas/GetSessionOk'
+              - $ref: '#/components/schemas/GetSessionTCNotAccepted'
+            discriminator:
+              propertyName: outcome
+              mapping:
+                OK: '#/components/schemas/GetSessionOk'
+                TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED: '#/components/schemas/GetSessionTCNotAccepted'
+
+    # ------------------------------------------------------
+    # For updateSessionById
+    # ------------------------------------------------------
+    UpdateSessionReqAccepted:
+      description: Response returned when the request to update a session has been accepted
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              outcome:
+                $ref: '#/components/schemas/OutcomeForAccepted'
+            required:
+              - outcome
+            example:
+              outcome: "ACCEPTED"
+
+    # ------------------------------------------------------
+    # For createSession
+    # ------------------------------------------------------
+    SessionCreated:
+      description: Session created
+      headers:
+        Location:
+          description: URL to retrieve the session
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/URI'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateSession'
+
+    PairWithIORequired:
+      description: Pairing with IO is required
+      headers:
+        Location:
+          description: URL to check the status of pairing
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/URI'
+        Retry-After:
+          description: Number of seconds after which to check if pairing has been completed
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/PositiveInteger'
+        Max-Retries:
+          description: Max number of retries to check if the pairing has been completed
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/PositiveInteger'
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              outcome:
+                $ref: '#/components/schemas/OutcomeForPairingWithIO'
+              pairingToken:
+                $ref: '#/components/schemas/PairingToken'
+            required:
+              - outcome
+              - pairingToken
+            example:
+              outcome: "PAIR_WITH_IO"
+              pairingToken: "465937"
+
+    # ------------------------------------------------------
+    # For checkPairingStatus
+    # ------------------------------------------------------
+    PairingCompleted:
+      description: Pairing completed
+      headers:
+        Location:
+          description: URL to retrieve the session
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/URI'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateSession'
+
+  # ========================================================
+  # Security schemes
+  # ========================================================
   securitySchemes:
     ApiKeyAuth:
-      type: apiKey
-      description: This API uses API key
-      name: Ocp-Apim-Subscription-Key
-      in: header
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
