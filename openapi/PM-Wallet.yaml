@@ -45,7 +45,7 @@ paths:
         "404":
           description: Tax code not found
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "429":
           description: Too many request
         "500":
@@ -75,9 +75,9 @@ paths:
         "403":
           description: Forbidden
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "415":
-          description: Unsupported media type. Did you provide application/xml?
+          description: Unsupported media type. Did you provide application/json?
         "429":
           description: Too many request
         "500":
@@ -112,7 +112,7 @@ paths:
         "404":
           description: Tax code not found
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "429":
           description: Too many request
         "500":

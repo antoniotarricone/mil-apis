@@ -1,0 +1,129 @@
+openapi: 3.0.3
+
+info:
+  title: Terms and Condition Microservice
+  version: 1.0.0
+  description: Terms and Condition Microservice for Multi-channel Integration Layer of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+  - description: Terms and Condition URL
+    url: https://server_addr
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /acceptedTermsConds:
+    post:
+      operationId: accept
+      summary: Store the acceptance of T&C for the user identified by the tax code stored in the session
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+        - name: SessionId
+          in: header
+          description: ID of the session
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/UUID'
+      responses:
+        "201":
+          $ref: '#/components/responses/Stored'
+        "400":
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+
+  /acceptedTermsConds/{taxCode}:
+    get:
+      operationId: check
+      summary: Check the acceptance of T&C for the user identified by the tax code
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+        - name: taxCode
+          in: path
+          description: Tax code of the user
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/TaxCode'
+      responses:
+        "200":
+          $ref: '#/components/responses/Retrieved'
+        "400":
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+components:
+  responses:
+    Stored:
+      description: Acceptance stored
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              saveNewCards:
+                description: If true the client should invoke the presave operation of the Wallet microservice
+                type: boolean
+            required:
+              - saveNewCards
+            example:
+              saveNewCards: true
+
+    Retrieved:
+      description: Acceptance stored
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              outcome:
+                type: string
+                enum:
+                  - OK
+                  - TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED
+            required:
+              - outcome
+            example:
+              outcome: "OK"
+
+  # ========================================================
+  # Security schemes
+  # ========================================================
+  securitySchemes:
+    ApiKeyAuth:
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'

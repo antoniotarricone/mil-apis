@@ -47,7 +47,7 @@ paths:
         "404":
           description: Payment notice not found
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "429":
           description: Too many request
         "500":
@@ -75,9 +75,9 @@ paths:
         "404":
           description: Payment notice not found
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "415":
-          description: Unsupported media type. Did you provide application/xml?
+          description: Unsupported media type. Did you provide application/json?
         "429":
           description: Too many request
         "500":
@@ -123,7 +123,7 @@ paths:
         "404":
           description: Payment notice not found
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "429":
           description: Too many request
         "500":
@@ -152,9 +152,9 @@ paths:
         "404":
           description: Payment notice not found
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "415":
-          description: Unsupported media type. Did you provide application/xml?
+          description: Unsupported media type. Did you provide application/json?
         "429":
           description: Too many request
         "500":
@@ -188,9 +188,9 @@ paths:
         "404":
           description: Fee not found
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "415":
-          description: Unsupported media type. Did you provide application/xml?
+          description: Unsupported media type. Did you provide application/json?
         "429":
           description: Too many request
         "500":
@@ -222,9 +222,9 @@ paths:
         "403":
           description: Forbidden
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "415":
-          description: Unsupported media type. Did you provide application/xml?
+          description: Unsupported media type. Did you provide application/json?
         "429":
           description: Too many request
         "500":
@@ -262,9 +262,9 @@ paths:
         "404":
           $ref: '#/components/responses/TransactionNotFound'
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "415":
-          description: Unsupported media type. Did you provide application/xml?
+          description: Unsupported media type. Did you provide application/json?
         "429":
           description: Too many request
         "500":
@@ -296,7 +296,7 @@ paths:
         "404":
           description: Payment status not found
         "406":
-          description: Not acceptable. Did you require application/xml?
+          description: Not acceptable. Did you require application/json?
         "429":
           description: Too many request
         "500":
