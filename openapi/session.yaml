@@ -17,18 +17,24 @@ security:
 
 paths:
   /sessions/{id}:
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/Version'
+      - $ref: 'common.yaml#/components/parameters/AcquirerId'
+      - $ref: 'common.yaml#/components/parameters/Channel'
+      - $ref: 'common.yaml#/components/parameters/TerminalId'
+      - name: id
+        description: Session ID
+        in: path
+        required: true
+        schema:
+          $ref: 'common.yaml#/components/schemas/UUID'
+
     # ------------------------------------------------------
     # Read session by ID
     # ------------------------------------------------------
     get:
       operationId: getSessionById
       summary: Read a session by ID
-      parameters:
-        - $ref: 'common.yaml#/components/parameters/Version'
-        - $ref: 'common.yaml#/components/parameters/AcquirerId'
-        - $ref: 'common.yaml#/components/parameters/Channel'
-        - $ref: 'common.yaml#/components/parameters/TerminalId'
-        - $ref: 'common.yaml#/components/parameters/SessionId'
       responses:
         "200":
           $ref: '#/components/responses/SessionRetrieved'
@@ -55,12 +61,6 @@ paths:
     delete:
       operationId: deleteSessionById
       summary: Delete a session by ID
-      parameters:
-        - $ref: 'common.yaml#/components/parameters/Version'
-        - $ref: 'common.yaml#/components/parameters/AcquirerId'
-        - $ref: 'common.yaml#/components/parameters/Channel'
-        - $ref: 'common.yaml#/components/parameters/TerminalId'
-        - $ref: 'common.yaml#/components/parameters/SessionId'
       responses:
         "204":
           description: Session deleted
@@ -87,12 +87,6 @@ paths:
     patch:
       operationId: updateSessionById
       summary: Update partially a session by ID
-      parameters:
-        - $ref: 'common.yaml#/components/parameters/Version'
-        - $ref: 'common.yaml#/components/parameters/AcquirerId'
-        - $ref: 'common.yaml#/components/parameters/Channel'
-        - $ref: 'common.yaml#/components/parameters/TerminalId'
-        - $ref: 'common.yaml#/components/parameters/SessionId'
       requestBody:
         $ref: '#/components/requestBodies/UpdateSession'
       responses:
@@ -118,17 +112,18 @@ paths:
           description: Unexpected error
 
   /sessions:
+    parameters:
+      - $ref: 'common.yaml#/components/parameters/Version'
+      - $ref: 'common.yaml#/components/parameters/AcquirerId'
+      - $ref: 'common.yaml#/components/parameters/Channel'
+      - $ref: 'common.yaml#/components/parameters/TerminalId'
+
     # ------------------------------------------------------
     # Create a session
     # ------------------------------------------------------
     post:
       operationId: createSession
       summary: Create a session
-      parameters:
-        - $ref: 'common.yaml#/components/parameters/Version'
-        - $ref: 'common.yaml#/components/parameters/AcquirerId'
-        - $ref: 'common.yaml#/components/parameters/Channel'
-        - $ref: 'common.yaml#/components/parameters/TerminalId'
       requestBody:
         $ref: '#/components/requestBodies/CreateSession'
       responses:
@@ -160,10 +155,6 @@ paths:
       operationId: checkPairingStatus
       summary: Retrieve the pairing status with IO
       parameters:
-        - $ref: 'common.yaml#/components/parameters/Version'
-        - $ref: 'common.yaml#/components/parameters/AcquirerId'
-        - $ref: 'common.yaml#/components/parameters/Channel'
-        - $ref: 'common.yaml#/components/parameters/TerminalId'
         - name: pairingToken
           in: query
           description: Pairing token
