@@ -1,6 +1,6 @@
 info:
   title: Common components
-  version: 2.0.0
+  version: 2.1.0
   description: Common components for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -161,3 +161,13 @@ components:
       description: This API uses API key
       name: Ocp-Apim-Subscription-Key
       in: header
+
+    oAuth2ClientCredentials:
+      type: oauth2
+      description: This API uses OAuth2 with Client Credentials Grant
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth2/token/
+          scopes:
+            internal: The API cannot be invoked by clients (e.g. ATM Gateway)
+            external: The API can be invoked by clients (e.g. ATM Gateway)
