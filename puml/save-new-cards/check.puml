@@ -1,0 +1,10 @@
+group Retrieve //<save new cards flag>// - <font color="red">If this fails the processing continues as //<save new cards flag>// is false</font>
+	$client -> WS : GET /enabledServices///<tax code>///saveNewCards
+	WS --> $client : HTTP 200 (ok)
+		rnote left
+			__response body__
+			{
+				"saveNewCards": //<save new cards flag>//
+			}
+		end note
+end
