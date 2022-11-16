@@ -1,0 +1,70 @@
+openapi: 3.0.3
+
+info:
+  title: Wallet Microservice
+  version: 1.0.0
+  description: Wallet Microservice for Multi-channel Integration Layer of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+  - description: Wallet URL
+    url: https://server_addr
+
+paths:
+  /cards:
+    post:
+      operationId: presaveExplicit
+      summary: Pre-save the payment card in the internal Wallet
+      security:
+        - oAuth2ClientCredentials: [ external ]
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                panToken:
+                  $ref: 'common.yaml#/components/schemas/PanToken'
+              required:
+                - panToken
+              example:
+                panToken: "517a4216840E461fB011036A0fd134E1"
+      responses:
+        "200":
+          description: Presave processed successfully
+        "400":
+          $ref: 'common.yaml#/components/responses/ConstraintViolation'
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "415":
+          description: Unsupported media type. Did you provide application/json?
+        "429":
+          description: Too many request
+        "500":
+          description: Server error
+        default:
+          description: Unexpected error
+
+components:
+  securitySchemes:
+    oAuth2ClientCredentials:
+      type: oauth2
+      description: This API uses OAuth2 with Client Credentials Grant
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth2/token/
+          scopes:
+            internal: The API cannot be invoked by clients (e.g. ATM Gateway)
+            external: The API can be invoked by clients (e.g. ATM Gateway)
