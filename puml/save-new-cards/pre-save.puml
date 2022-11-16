@@ -1,0 +1,18 @@
+group Pre-save payment card in the Wallet
+	$client -> WS : POST /cards
+	rnote left
+		__header__
+		- Version: //<api version>//
+		
+		__request body__
+		{
+			"panToken": "//<pan token>//",
+			"taxCode": "//<tax code>//"
+		}
+	end note
+	
+	WS --> $client : HTTP *
+	rnote left
+		<font color="red">The processing continues aside from HTTP status code</font>
+	end note
+end
