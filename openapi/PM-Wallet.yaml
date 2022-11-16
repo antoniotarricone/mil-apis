@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: PM-Wallet Service
-  version: 5.0.0
+  version: 6.0.0
   description: Service to handle payment cards Wallet in the PagoPA Ecosystem
   contact:
     name: Antonio Tarricone
@@ -16,7 +16,7 @@ security:
   - ApiKeyAuth: [ ]
 
 paths:
-  /cards/{token}/taxCode:
+  /cards/{panToken}/taxCode:
     # ------------------------------------------------------
     # Retrieve the tax code of the owner of the payment card
     # that has the PAN linked to the given token.
@@ -27,8 +27,8 @@ paths:
       description: Retrieve the tax code by querying internal DB or invoking Bancomat, Nexi, SIA, Intesa Sanpaolo, Poste Italiane or ICCREA service
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
-        - name: token
-          description: Token
+        - name: panToken
+          description: Token of the PAN
           in: path
           required: true
           schema:
@@ -136,15 +136,15 @@ components:
             type: object
             additionalProperties: false
             properties:
-              token:
+              panToken:
                 $ref: 'common.yaml#/components/schemas/PanToken'
               taxCode:
                 $ref: 'common.yaml#/components/schemas/TaxCode'
             required:
-              - token
+              - panToken
               - taxCode
             example:
-              token: "517a4216840E461fB011036A0fd134E1"
+              panToken: "517a4216840E461fB011036A0fd134E1"
               taxCode: "CHCZLN73D08A662B"
 
   # ========================================================
