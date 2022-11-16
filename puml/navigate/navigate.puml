@@ -1,0 +1,42 @@
+@startuml
+!include_many ../common/skin.puml
+!include_many ../common/actors.puml
+
+
+group#Gold navigate
+	AG -> SR : GET /services
+		rnote left
+			__header__
+			- Version: //<api version>//
+			- AcquirerId: //<acquirer id>//
+			- Channel: //<channel>//
+			- TerminalId: //<terminal id>//
+		end note
+	
+		SR -> SC : readItem ( //<channel>// )
+		
+		SC --> SR : { "services": [ { "name": { "it": "//<service name in it>//", "en": "//<service name in en>//", "fr": "//<service name in fr>//", "de": "//<service name in de>//", "es": "//<service name in es>//" }, "serviceId": "//<service id>//" }, ... ] }
+	
+	SR --> AG : HTTP 200 (ok)
+		rnote left
+			__response body__
+			{
+				"services": [
+					{
+						"labels": {
+							"it": "//<service name in it>//",
+							"en": "//<service name in en>//",
+							"fr": "//<service name in fr>//",
+							"de": "//<service name in de>//",
+							"es": "//<service name in es>//"
+						},
+						"serviceId": "//<service id>//"
+					},
+					.
+					.
+					.
+				]
+			}
+		end note
+end
+@enduml
