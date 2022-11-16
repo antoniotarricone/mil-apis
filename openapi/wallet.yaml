@@ -39,8 +39,8 @@ paths:
               example:
                 panToken: "517a4216840E461fB011036A0fd134E1"
       responses:
-        "200":
-          description: Presave processed successfully
+        "204":
+          description: Ack
         "400":
           $ref: 'common.yaml#/components/responses/ConstraintViolation'
         "401":
