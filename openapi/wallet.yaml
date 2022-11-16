@@ -12,13 +12,14 @@ servers:
   - description: Wallet URL
     url: https://server_addr
 
+security:
+  - ApiKeyAuth: [ ]
+
 paths:
   /cards:
     post:
       operationId: presaveExplicit
       summary: Pre-save the payment card in the internal Wallet
-      security:
-        - oAuth2ClientCredentials: [ external ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
@@ -59,12 +60,5 @@ paths:
 
 components:
   securitySchemes:
-    oAuth2ClientCredentials:
-      type: oauth2
-      description: This API uses OAuth2 with Client Credentials Grant
-      flows:
-        clientCredentials:
-          tokenUrl: /oauth2/token/
-          scopes:
-            internal: The API cannot be invoked by clients (e.g. ATM Gateway)
-            external: The API can be invoked by clients (e.g. ATM Gateway)
+    ApiKeyAuth:
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
