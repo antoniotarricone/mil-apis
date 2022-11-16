@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: PAN-to-Token Service and viceversa
-  version: 4.0.0
+  version: 5.0.0
   description: Service to create or retrieve, if it already exists, the token of a given PAN and viceversa
   contact:
     name: Antonio Tarricone
@@ -50,7 +50,7 @@ paths:
         default:
           description: Unexpected error
 
-  /pans/{token}:
+  /pans/{panToken}:
     # ------------------------------------------------------
     # Retrieves the PAN of a given token.
     # ------------------------------------------------------
@@ -59,8 +59,8 @@ paths:
       summary: Retrieve the PAN of a given token
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
-        - name: token
-          description: Token
+        - name: panToken
+          description: Token of the PAN
           in: path
           required: true
           schema:
@@ -136,12 +136,12 @@ components:
             type: object
             additionalProperties: false
             properties:
-              token:
+              panToken:
                 $ref: 'common.yaml#/components/schemas/PanToken'
             required:
-              - token
+              - panToken
             example:
-              token: "517a4216840E461fB011036A0fd134E1"
+              panToken: "517a4216840E461fB011036A0fd134E1"
 
     # ------------------------------------------------------
     # For getPan
