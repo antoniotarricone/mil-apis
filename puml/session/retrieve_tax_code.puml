@@ -1,0 +1,20 @@
+group Retrieve tax code - <font color="red">Only for PagoBancomat PANs</font>
+	SS -> WS : GET /cards///<pan token>///taxCode
+		rnote left
+			__header__
+			- Version: //<api version>//
+		end note
+	
+	WS -> WS : Search the local DB
+		rnote left
+			Search completed successfully
+		end note
+	
+	WS --> SS : HTTP 200 (ok)
+		rnote left
+			__response body__
+			{
+				"taxCode": "//<tax code>//"
+			}
+		end note
+end
