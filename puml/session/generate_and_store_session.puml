@@ -1,0 +1,15 @@
+group Generate and store session
+	SS -> SS : generate //<session id>//
+	
+	SS -> RD : JSON.SET //<session id>// $ '//<value>//'
+		rnote left
+			__value__
+			{
+				"taxCode": "//<tax code>//",
+				"termsAndCondsAccepted": true,
+				"saveNewCards": //<save new cards flag>//
+			}
+		end note
+	
+	RD --> SS
+end
