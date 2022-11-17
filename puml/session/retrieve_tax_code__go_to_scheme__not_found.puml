@@ -1,5 +1,5 @@
 group Retrieve tax code
-	SS -> WS : GET /cards///<pan token>///taxCode
+	SessionSrv -> WS : GET /cards///<pan token>///taxCode
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -13,13 +13,13 @@ group Retrieve tax code
 	end
 		
 	group Token to PAN
-		WS -> RTD : GET /pans///<pan token>//
+		WS -> PANTokenizer : GET /pans///<pan token>//
 			rnote left
 				__header__
 				- Version: //<api version>//
 			end note
 		
-		RTD --> WS : HTTP 200 (ok)
+		PANTokenizer --> WS : HTTP 200 (ok)
 			rnote left
 				__response body__
 				{
@@ -31,7 +31,7 @@ group Retrieve tax code
 	group Go to Bancomat or Nexi or SIA or Poste Italiane or Intesa Sanpaolo or ICCREA
 		WS -> WS : Search target by BIN
 	
-		WS -> IS : POST /taxcodes
+		WS -> ServiceCenter : POST /taxcodes
 			rnote left
 				__request body__
 				{
@@ -39,9 +39,9 @@ group Retrieve tax code
 				}
 			end note
 		alt Card not found
-		    IS --> WS : HTTP 404 (not found)
+		    ServiceCenter --> WS : HTTP 404 (not found)
 		else Card not valid
-		    IS --> WS : HTTP 200 (ok)
+		    ServiceCenter --> WS : HTTP 200 (ok)
         		rnote left
         			__response body__
         			{
@@ -52,5 +52,5 @@ group Retrieve tax code
         end
 	end
 		
-	WS --> SS : HTTP 404 (not found)
+	WS --> SessionSrv : HTTP 404 (not found)
 end

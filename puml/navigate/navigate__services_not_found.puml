@@ -4,7 +4,7 @@
 
 
 group#Gold navigate
-	AG -> SR : GET /services
+	Client -> FunctionSrv : GET /services
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -12,10 +12,10 @@ group#Gold navigate
 			- Channel: //<channel>//
 		end note
 	
-	SR -> SC : readItem ( //<channel>// )
+	FunctionSrv -> FunctionDB : readItem ( //<channel>// )
 	
-	SC --> SR : null
+	FunctionDB --> FunctionSrv : null
 	
-	SR --> AG : HTTP 404 (not found)
+	FunctionSrv --> Client : HTTP 404 (not found)
 end
 @enduml

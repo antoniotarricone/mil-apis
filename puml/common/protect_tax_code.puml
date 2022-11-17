@@ -1,5 +1,5 @@
 group Protect tax code
-	TS -> TK : PUT /tokens
+	TCSrv -> Tokenizer : PUT /tokens
 		rnote left
 			__request body__
 			{
@@ -7,7 +7,7 @@ group Protect tax code
 			}
 		end note
 					
-	TK --> TS : HTTP 200 (ok)
+	Tokenizer --> TCSrv : HTTP 200 (ok)
 		rnote left
 			__response body__
 			{

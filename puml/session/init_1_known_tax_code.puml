@@ -3,7 +3,7 @@
 !include_many ../common/actors.puml
 
 group#Gold init
-	AG -> SS : POST /sessions
+	Client -> SessionSrv : POST /sessions
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -19,12 +19,12 @@ group#Gold init
 	
 	!include_many ../terms-and-conditions/check_acceptance_of_tc.puml
 	
-	!$client = SS
+	!$client = SessionSrv
 	!include_many ../save-new-cards/check.puml
 	
 	!include_many generate_and_store_session.puml
 	
-	SS --> AG : HTTP 201 (created)
+	SessionSrv --> Client : HTTP 201 (created)
 		rnote left
 			__header__
 			- Location: /sessions///<session id>//

@@ -4,7 +4,7 @@
 
 
 group#Gold end
-	AG -> SS : DELETE /sessions///<session id>//
+	Client -> SessionSrv : DELETE /sessions///<session id>//
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -13,10 +13,10 @@ group#Gold end
 			- TerminalId: //<terminal id>//
 		end note
 	
-		SS -> RD : DEL //<session id>//
+		SessionSrv -> SessionCache : DEL //<session id>//
 		
-		RD --> SS : 1
+		SessionCache --> SessionSrv : 1
 	
-	SS --> AG : HTTP 204 (no content)
+	SessionSrv --> Client : HTTP 204 (no content)
 end
 @enduml

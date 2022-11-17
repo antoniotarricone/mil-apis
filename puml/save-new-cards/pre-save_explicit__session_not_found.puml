@@ -3,7 +3,7 @@
 !include_many ../common/actors.puml
 
 group pre-save
-	AG -> IWS : POST /cards
+	Client -> WalletWrp : POST /cards
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -17,16 +17,16 @@ group pre-save
 			}
 		end note
 	
-	!$client = IWS
+	!$client = WalletWrp
 	!include_many ../session/check__session_not_found.puml
 	
-	IWS --> AG : HTTP 400 (bad request)
+	WalletWrp --> Client : HTTP 400 (bad request)
 		rnote left
 			__response body__
 			{
 			    "violations": [
 			        {
-			            "message": "SESSION_NOT_FOUND"
+			            "message": "SESessionSrvION_NOT_FOUND"
 			        }
 			    ]
 			}

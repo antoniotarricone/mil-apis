@@ -4,7 +4,7 @@
 
 
 group#Gold navigate
-	AG -> SR : GET /services
+	Client -> FunctionSrv : GET /services
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -13,11 +13,11 @@ group#Gold navigate
 			- TerminalId: //<terminal id>//
 		end note
 	
-		SR -> SC : readItem ( //<channel>// )
+		FunctionSrv -> FunctionDB : readItem ( //<channel>// )
 		
-		SC --> SR : { "services": [ { "name": { "it": "//<service name in it>//", "en": "//<service name in en>//", "fr": "//<service name in fr>//", "de": "//<service name in de>//", "es": "//<service name in es>//" }, "serviceId": "//<service id>//" }, ... ] }
+		FunctionDB --> FunctionSrv : { "services": [ { "name": { "it": "//<service name in it>//", "en": "//<service name in en>//", "fr": "//<service name in fr>//", "de": "//<service name in de>//", "es": "//<service name in es>//" }, "serviceId": "//<service id>//" }, ... ] }
 	
-	SR --> AG : HTTP 200 (ok)
+	FunctionSrv --> Client : HTTP 200 (ok)
 		rnote left
 			__response body__
 			{

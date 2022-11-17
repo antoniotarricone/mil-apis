@@ -4,7 +4,7 @@
 
 
 group#Gold accept
-	AG -> TS : POST /acceptedTermsConds
+	Client -> TCSrv : POST /acceptedTermsConds
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -14,16 +14,16 @@ group#Gold accept
 			- SessionId: //<session id>//
 		end note
 		
-	!$client = TS
+	!$client = TCSrv
 	!include_many ../session/check__session_not_found.puml
 	
-	TS --> AG : HTTP 400 (bad request)
+	TCSrv --> Client : HTTP 400 (bad request)
 		rnote left
 			__response body__
 			{
 			    "violations": [
 			        {
-			            "message": "SESSION_NOT_FOUND"
+			            "message": "SESessionSrvION_NOT_FOUND"
 			        }
 			    ]
 			}

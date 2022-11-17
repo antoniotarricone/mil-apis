@@ -3,7 +3,7 @@
 !include_many ../common/actors.puml
 
 group Protect PAN
-	AG -> RTD : POST /tokens
+	Client -> PANTokenizer : POST /tokens
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -14,7 +14,7 @@ group Protect PAN
 		end note
 	        
 	
-	RTD --> AG : HTTP 200 (ok) or 201 (created)
+	PANTokenizer --> Client : HTTP 200 (ok) or 201 (created)
 		rnote left
 			__response body__
 			{

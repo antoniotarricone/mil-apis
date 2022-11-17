@@ -1,5 +1,5 @@
 group Check acceptance of T&C
-	SS -> TS : GET /acceptedTermsConds///<tax code token>//
+	SessionSrv -> TCSrv : GET /acceptedTermsConds///<tax code token>//
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -10,13 +10,13 @@ group Check acceptance of T&C
 		
 	!include_many ../common/protect_tax_code.puml
 	
-	TS -> TC : readItem ( //<tax code token>// )
+	TCSrv -> TCDB : readItem ( //<tax code token>// )
 	
-	TC --> TS : { "version": "//<t&c version>//" }
+	TCDB --> TCSrv : { "version": "//<t&c version>//" }
 	
-	TS -> TS : check //<t&c version>//
+	TCSrv -> TCSrv : check //<t&c version>//
 	
-	TS --> SS : HTTP 200 (ok)
+	TCSrv --> SessionSrv : HTTP 200 (ok)
 		rnote left
 			__response body__
 			{

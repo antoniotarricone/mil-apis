@@ -1,5 +1,5 @@
 group Check session
-	$client -> SS : GET /sessions///<session id>//
+	$client -> SessionSrv : GET /sessions///<session id>//
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -8,9 +8,9 @@ group Check session
 			- TerminalId: //<terminal id>//
 		end note
 	
-	SS -> RD : GET //<session id>//
+	SessionSrv -> SessionCache : GET //<session id>//
 	
-	RD --> SS : null
+	SessionCache --> SessionSrv : null
 	
-	SS --> $client : HTTP 404 (not found)
+	SessionSrv --> $client : HTTP 404 (not found)
 end

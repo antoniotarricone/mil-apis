@@ -1,7 +1,7 @@
 group Generate and store session
-	SS -> SS : generate //<session id>//
+	SessionSrv -> SessionSrv : generate //<session id>//
 	
-	SS -> RD : JSON.SET //<session id>// $ '//<value>//'
+	SessionSrv -> SessionCache : JSON.SET //<session id>// $ '//<value>//'
 		rnote left
 			__value__
 			{
@@ -10,5 +10,5 @@ group Generate and store session
 			}
 		end note
 	
-	RD --> SS
+	SessionCache --> SessionSrv
 end

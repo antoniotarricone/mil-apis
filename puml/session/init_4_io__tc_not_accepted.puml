@@ -4,7 +4,7 @@
 
 group#Gold init
 	group Accepting phase
-		AG -> SS : POST /sessions
+		Client -> SessionSrv : POST /sessions
 			rnote left
 				__header__
 				- Version: //<api version>//
@@ -21,9 +21,9 @@ group#Gold init
 		!include_many retrieve_tax_code__go_to_scheme__not_found.puml
 		
 		'**************** Pairing token generation ****************
-		SS -> SS : generate //<pairing token>//
+		SessionSrv -> SessionSrv : generate //<pairing token>//
 		
-		{wait_for_attempt_1_begin} SS --> AG : HTTP 202 (accepted)
+		{wait_for_attempt_1_begin} SessionSrv --> Client : HTTP 202 (accepted)
 			rnote left
 				__header__
 				- Location: /sessions?pairingToken=//<pairing token>//
@@ -40,7 +40,7 @@ group#Gold init
 	
 	'**************** 1st attempt to check pairing completion ****************
 	group 1st attempt
-		{wait_for_attempt_1_end} AG -> SS : GET /sessions?pairingToken=//<pairing token>//
+		{wait_for_attempt_1_end} Client -> SessionSrv : GET /sessions?pairingToken=//<pairing token>//
 			rnote left
 				__header__
 				- Version: //<api version>//
@@ -51,15 +51,15 @@ group#Gold init
 		
 		{wait_for_attempt_1_begin} <-> {wait_for_attempt_1_end} : <font color="darkorange">1) Retry-After: //<retry after>//</font>
 		
-		SS -> RD : GETDEL //<pairing token>//
-		RD --> SS : null
+		SessionSrv -> SessionCache : GETDEL //<pairing token>//
+		SessionCache --> SessionSrv : null
 		
-		{wait_for_attempt_2_begin} SS --> AG : HTTP 404 (not found)
+		{wait_for_attempt_2_begin} SessionSrv --> Client : HTTP 404 (not found)
 	end
 	
 	'**************** Pairing with App IO ****************
 	group Pairing with App IO
-		IO -> SS : POST /pairings
+		IO -> SessionSrv : POST /pairings
 			rnote left
 				__header__
 				- Version: //<api version>//
@@ -77,16 +77,16 @@ group#Gold init
 				(*) It's encoded in the QR-code scanned by App IO
 			end note
 		
-		SS -> RD : JSON.SET //<pairing token>// $ '{ "taxCode": "//<tax code>//" }'
+		SessionSrv -> SessionCache : JSON.SET //<pairing token>// $ '{ "taxCode": "//<tax code>//" }'
 		
-		RD --> SS : OK
+		SessionCache --> SessionSrv : OK
 		
-		SS --> IO : HTTP 204 (no content)
+		SessionSrv --> IO : HTTP 204 (no content)
 	end
 	
 	'**************** 2nd attempt to check pairing completion ****************
 	group 2nd attempt
-		{wait_for_attempt_2_end} AG -> SS : GET /sessions?pairingToken=//<pairing token>//
+		{wait_for_attempt_2_end} Client -> SessionSrv : GET /sessions?pairingToken=//<pairing token>//
 			rnote left
 				__header__
 				- Version: //<api version>//
@@ -97,8 +97,8 @@ group#Gold init
 		
 		{wait_for_attempt_2_begin} <-> {wait_for_attempt_2_end} : <font color="darkorange">2) Retry-After: //<retry after>//</font>
 		
-		SS -> RD : GETDEL //<pairing token>//
-		RD --> SS
+		SessionSrv -> SessionCache : GETDEL //<pairing token>//
+		SessionCache --> SessionSrv
 			rnote left
 				__value__
 				{
@@ -110,7 +110,7 @@ group#Gold init
 		
 		!include_many generate_and_store_session__tc_not_accepted.puml
 		
-		SS --> AG : HTTP 200 (created)
+		SessionSrv --> Client : HTTP 200 (created)
 			rnote left
 				__header__
 				- Location: /sessions///<session id>//

@@ -3,7 +3,7 @@
 !include_many ../common/actors.puml
 
 group#Gold verify
-	AG -> PS : GET /paymentNotices///<pa tax code>/////<notice number>//
+	Client -> NoticeSrv : GET /paymentNotices///<pa tax code>/////<notice number>//
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -12,12 +12,12 @@ group#Gold verify
 			- TerminalId: //<terminal id>//
 		end note
 		
-	'!$client = PS
+	'!$client = NoticeSrv
 	'!include_many ../session/check.puml
 	
-	PS -> PS : Retrieve //<psp id>//, //<psp broker id>//, //<password>// by //<acquirer id>//
+	NoticeSrv -> NoticeSrv : Retrieve //<psp id>//, //<psp broker id>//, //<password>// by //<acquirer id>//
 
-	PS -> NP : POST /verifyPaymentNotice
+	NoticeSrv -> Nodo : POST /verifyPaymentNotice
 		rnote left
 			__request body__
 			<verifyPaymentNoticeReq>
@@ -32,7 +32,7 @@ group#Gold verify
 			</verifyPaymentNoticeReq>
 		end note
 
-	NP --> PS : HTTP 200 (ok)
+	Nodo --> NoticeSrv : HTTP 200 (ok)
 		rnote left
 			__response body__
 			<verifyPaymentNoticeRes>
@@ -52,7 +52,7 @@ group#Gold verify
 			</verifyPaymentNoticeRes>
 		end note
 
-	PS --> AG : HTTP 200 (ok)
+	NoticeSrv --> Client : HTTP 200 (ok)
 		rnote left
 			__response body__
 			{

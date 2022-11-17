@@ -1,5 +1,5 @@
 group Retrieve tax code - <font color="red">Only for PagoBancomat PANs</font>
-	SS -> WS : GET /cards///<pan token>///taxCode
+	SessionSrv -> WS : GET /cards///<pan token>///taxCode
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -10,7 +10,7 @@ group Retrieve tax code - <font color="red">Only for PagoBancomat PANs</font>
 			Search completed successfully
 		end note
 	
-	WS --> SS : HTTP 200 (ok)
+	WS --> SessionSrv : HTTP 200 (ok)
 		rnote left
 			__response body__
 			{

@@ -4,7 +4,7 @@
 
 
 group#Gold accept
-	AG -> TS : POST /acceptedTermsConds
+	Client -> TCSrv : POST /acceptedTermsConds
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -14,19 +14,19 @@ group#Gold accept
 			- SessionId: //<session id>//
 		end note
 		
-	!$client = TS
+	!$client = TCSrv
 	!include_many ../session/check__tc_not_accepted.puml
 	
 	!include_many ../common/protect_tax_code.puml
 	
-	TS -> TC : upsertItem ( //<tax code token>//, { "version": , "//<t&c version>//" } )
+	TCSrv -> TCDB : upsertItem ( //<tax code token>//, { "version": , "//<t&c version>//" } )
 	
-	TC --> TS
+	TCDB --> TCSrv
 	
 	!include_many ../save-new-cards/check.puml
 	
 	group Update session
-		TS -> SS : PATCH /sessions///<session id>//
+		TCSrv -> SessionSrv : PATCH /sessions///<session id>//
 			rnote left
 				__header__
 				- Version: //<api version>//
@@ -41,20 +41,20 @@ group#Gold accept
 				}
 			end note
 	
-		SS --> TS : HTTP 202 (accepted)
+		SessionSrv --> TCSrv : HTTP 202 (accepted)
 	
-		SS -> RD : JSON.SET //<session id>// $.termsAndCondsAccepted 'true'
+		SessionSrv -> SessionCache : JSON.SET //<session id>// $.termsAndCondsAccepted 'true'
 	
-		RD --> SS
+		SessionCache --> SessionSrv
 		
-		SS -> RD : JSON.SET //<session id>// $.saveNewCards '//<save new cards flag>//'
+		SessionSrv -> SessionCache : JSON.SET //<session id>// $.saveNewCards '//<save new cards flag>//'
 	
-		RD --> SS
+		SessionCache --> SessionSrv
 	end
 	
 	
 	
-	TS --> AG : HTTP 201 (created)
+	TCSrv --> Client : HTTP 201 (created)
 		rnote left
 			__response body__
 			{

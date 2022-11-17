@@ -3,7 +3,7 @@
 !include_many ../common/actors.puml
 
 group pre-save
-	AG -> IWS : POST /cards
+	Client -> WalletWrp : POST /cards
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -17,10 +17,10 @@ group pre-save
 			}
 		end note
 	
-	!$client = IWS
+	!$client = WalletWrp
 	!include_many ../session/check.puml
 	
-	IWS -> WS : POST /cards
+	WalletWrp -> WS : POST /cards
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -32,8 +32,8 @@ group pre-save
 			}
 		end note
 	
-	WS --> IWS : HTTP __not__ 201
+	WS --> WalletWrp : HTTP __not__ 201
 	
-	IWS --> AG : HTTP 500 (server error)
+	WalletWrp --> Client : HTTP 500 (server error)
 end
 @enduml
