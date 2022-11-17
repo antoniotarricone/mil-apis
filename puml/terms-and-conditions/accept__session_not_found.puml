@@ -1,0 +1,32 @@
+@startuml
+!include_many ../common/skin.puml
+!include_many ../common/actors.puml
+
+
+group#Gold accept
+	AG -> TS : POST /acceptedTermsConds
+		rnote left
+			__header__
+			- Version: //<api version>//
+			- AcquirerId: //<acquirer id>//
+			- Channel: //<channel>//
+			- TerminalId: //<terminal id>//
+			- SessionId: //<session id>//
+		end note
+		
+	!$client = TS
+	!include_many ../session/check__session_not_found.puml
+	
+	TS --> AG : HTTP 400 (bad request)
+		rnote left
+			__response body__
+			{
+			    "violations": [
+			        {
+			            "message": "SESSION_NOT_FOUND"
+			        }
+			    ]
+			}
+		end note
+end
+@enduml
