@@ -1,0 +1,16 @@
+group Check session
+	$client -> SS : GET /sessions///<session id>//
+		rnote left
+			__header__
+			- Version: //<api version>//
+			- AcquirerId: //<acquirer id>//
+			- Channel: //<channel>//
+			- TerminalId: //<terminal id>//
+		end note
+	
+	SS -> RD : GET //<session id>//
+	
+	RD --> SS : null
+	
+	SS --> $client : HTTP 404 (not found)
+end
