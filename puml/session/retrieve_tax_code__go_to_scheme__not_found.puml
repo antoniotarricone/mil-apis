@@ -1,0 +1,56 @@
+group Retrieve tax code
+	SS -> WS : GET /cards///<pan token>///taxCode
+		rnote left
+			__header__
+			- Version: //<api version>//
+		end note
+		
+	opt PagoBancomat card
+		WS -> WS : Search the local DB
+			rnote left
+				Search unsuccessful
+			end note
+	end
+		
+	group Token to PAN
+		WS -> RTD : GET /pans///<pan token>//
+			rnote left
+				__header__
+				- Version: //<api version>//
+			end note
+		
+		RTD --> WS : HTTP 200 (ok)
+			rnote left
+				__response body__
+				{
+					"pan": "//<pan>//"
+				}
+			end note
+	end
+		
+	group Go to Bancomat or Nexi or SIA or Poste Italiane or Intesa Sanpaolo or ICCREA
+		WS -> WS : Search target by BIN
+	
+		WS -> IS : POST /taxcodes
+			rnote left
+				__request body__
+				{
+					"pan": "//<pan>//"
+				}
+			end note
+		alt Card not found
+		    IS --> WS : HTTP 404 (not found)
+		else Card not valid
+		    IS --> WS : HTTP 200 (ok)
+        		rnote left
+        			__response body__
+        			{
+        				"taxCode": "//<tax code>//",
+        				"status": "V"
+        			}
+        		end note
+        end
+	end
+		
+	WS --> SS : HTTP 404 (not found)
+end
