@@ -1,5 +1,5 @@
 @startuml
-'!include_many ../common/skin.puml
+!include_many ../common/skin.puml
 
 == Verify ==
 loop for each payment notice
