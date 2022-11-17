@@ -1,0 +1,35 @@
+group Check acceptance of T&C
+	SS -> TS : GET /acceptedTermsConds///<tax code token>//
+		rnote left
+			__header__
+			- Version: //<api version>//
+			- AcquirerId: //<acquirer id>//
+			- Channel: //<channel>//
+			- TerminalId: //<terminal id>//
+		end note
+		
+	!include_many ../common/protect_tax_code.puml
+	
+	TS -> TC : readItem ( //<tax code token>// )
+	
+	alt The accepted version is older then the current one
+		TC --> TS : { "version": "//<t&c version>//" }
+		
+		TS -> TS : check //<t&c version>//
+			rnote left
+				The accepted version is older then the current one
+			end note
+		
+		TS --> SS : HTTP 200 (ok)
+			rnote left
+				__response body__
+				{
+					"outcome": "TERMS_AND_CONDITIONS_NOT_YET_ACCEPTED"
+				}
+			end note
+	else T&C never accepted
+		TC --> TS : null
+		
+		TS --> SS : HTTP 404 (not found)
+	end
+end
