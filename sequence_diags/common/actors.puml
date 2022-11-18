@@ -25,3 +25,4 @@ participant "PDV-Tokenizer" as Tokenizer
 participant "Bancomat | Nexi | SIA |\nPoste Italiane |\nIntesa Sanpaolo | ICCREA" as ServiceCenter
 participant "IO Back-end" as IO
 participant "Nodo" as Nodo
+participant "Gestione Evoluta\nCommissioni" as GEC
