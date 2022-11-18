@@ -202,7 +202,7 @@ paths:
     # ------------------------------------------------------
     # Close the payment of a set of notices
     # ------------------------------------------------------
-    patch:
+    post:
       operationId: close
       summary: Close the payment of a set of notices
       parameters:
@@ -214,7 +214,9 @@ paths:
         $ref: '#/components/requestBodies/Close'
       responses:
         "200":
-          $ref: '#/components/responses/CloseProcessed'
+          $ref: '#/components/responses/OkCloseProcessed'
+        "202":
+          description: This response is returned for KO close only
         "400":
           $ref: 'common.yaml#/components/responses/ConstraintViolation'
         "401":
@@ -247,9 +249,9 @@ paths:
     # ------------------------------------------------------
     post:
       operationId: receivePaymentStatus
-      summary: Receive from the Nodo the result of the payment of a set of payment notices
+      summary: Receive from the Nodo the result of the payment of a set of payment notices. This API is invoked by the Nodo for sendPaymentResult.
       requestBody:
-        $ref: '#/components/requestBodies/PaymentStatus'
+        $ref: '#/components/requestBodies/PaymentStatusByNodo'
       responses:
         "200":
           $ref: '#/components/responses/PaymentStatusReceived'
@@ -517,6 +519,68 @@ components:
         office: "Ufficio di Roma"
         debtor: "Mario Rossi"
 
+    PaymentStatusByNodo:
+      description: Payment status communicated by the Nodo
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/AllOrNothingOutcome'
+        paymentDate:
+          description: Notification timestamp
+          type: string
+          format: date-time
+          maxLength: 19
+        payments:
+          description: Details of payment notices
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/PaymentDetailsByNodo'
+      required:
+        - outcome
+        - paymentDate
+        - payments
+      example:
+        outcome: "OK"
+        paymentDate: "2022-11-12T08:53:55"
+        payments:
+          - paymentToken: "648fhg36s95jfg7DS"
+            description: "Health ticket for chest x-ray"
+            creditorReferenceId: "4839d50603fssfW5X"
+            fiscalCode: "15376371009"
+            company: "ASL Roma"
+            office: "Ufficio di Roma"
+            debtor: "Mario Rossi"
+
+    PaymentDetailsByNodo:
+      description: Details of a payment notice communicated by the Nodo
+      type: object
+      additionalProperties: false
+      properties:
+        paymentToken:
+          $ref: '#/components/schemas/PaymentToken'
+        description:
+          $ref: '#/components/schemas/Description'
+        creditorReferenceId:
+          $ref: '#/components/schemas/CreditorReferenceId'
+        fiscalCode:
+          $ref: '#/components/schemas/PaTaxCode'
+        company:
+          $ref: '#/components/schemas/Company'
+        office:
+          $ref: '#/components/schemas/Office'
+        debtor:
+          $ref: '#/components/schemas/Debtor'
+      example:
+        paymentToken: "648fhg36s95jfg7DS"
+        description: "Health ticket for chest x-ray"
+        creditorReferenceId: "4839d50603fssfW5X"
+        fiscalCode: "15376371009"
+        company: "ASL Roma"
+        office: "Ufficio di Roma"
+        debtor: "Mario Rossi"
+
     Transfer:
       description: Transfer essential data
       type: object
@@ -743,12 +807,12 @@ components:
     # ------------------------------------------------------
     # For receivePaymentStatus
     # ------------------------------------------------------
-    PaymentStatus:
+    PaymentStatusByNodo:
       description: Payment status communicated by the Nodo
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/PaymentStatus'
+            $ref: '#/components/schemas/PaymentStatusByNodo'
 
   # ========================================================
   # Responses
@@ -800,8 +864,24 @@ components:
     # ------------------------------------------------------
     # For close
     # ------------------------------------------------------
-    CloseProcessed:
-      description: Response to close transaction
+    OkCloseProcessed:
+      description: Response to OK close transaction successfully processed
+      headers:
+        Location:
+          description: URL to check the status of payment confirmation. If outcome = OK the field is present.
+          required: false
+          schema:
+            $ref: 'common.yaml#/components/schemas/URI'
+        Retry-After:
+          description: Number of seconds after which to check the status of payment confirmation. If outcome = OK the field is present.
+          required: false
+          schema:
+            $ref: 'common.yaml#/components/schemas/PositiveInteger'
+        Max-Retries:
+          description: Max number of retries to check the status of payment confirmation. If outcome = OK the field is present.
+          required: false
+          schema:
+            $ref: 'common.yaml#/components/schemas/PositiveInteger'
       content:
         application/json:
           schema:
