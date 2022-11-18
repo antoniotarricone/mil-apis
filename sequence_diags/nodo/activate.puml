@@ -3,6 +3,7 @@
 !include_many ../common/actors.puml
 
 group#Gold activate
+    alt QR-code
 	Client -> NoticeSrv : PATCH /paymentNotices///<qr code>//
 		rnote left
 			__header__
@@ -18,9 +19,25 @@ group#Gold activate
 			}
 		end note
 
-	NoticeSrv -> NoticeSrv : Retrieve //<psp id>//, //<psp broker id>//, //<password>// by //<acquirer id>//
+		NoticeSrv -> NoticeSrv : parse //<qr code>//: //<pa tax code>//, //<notice number>//
+    else w/o QR-code
+        Client -> NoticeSrv : PATCH /paymentNotices///<pa tax code>/////<notice number>//
+    		rnote left
+    			__header__
+    			- Version: //<api version>//
+    			- AcquirerId: //<acquirer id>//
+    			- Channel: //<channel>//
+    			- TerminalId: //<terminal id>//
 
-	NoticeSrv -> NoticeSrv : parse //<qr code>//: //<pa tax code>//, //<notice number>//
+    			__request body__
+    			{
+    				"idempotencyKey": "//<idempotency key>//",
+    				"amount": "//<amount>//"
+    			}
+    		end note
+    end
+
+	NoticeSrv -> NoticeSrv : Retrieve //<psp id>//, //<psp broker id>//, //<password>// by //<acquirer id>//
 
 	NoticeSrv -> Nodo : POST /activatePaymentNotice
 		rnote left
@@ -81,7 +98,7 @@ group#Gold activate
 			        .
 			        .
 			    </metadata>
-			    <creditorReferenceId>CREDITOR REF ID #1</creditorReferenceId>
+			    <creditorReferenceId>//<creditor ref id #1>//</creditorReferenceId>
 			</activatePaymentNoticeV2Response>
 		end note
 

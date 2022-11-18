@@ -3,20 +3,30 @@
 !include_many ../common/actors.puml
 
 group#Gold verify
-	Client -> NoticeSrv : GET /paymentNotices///<pa tax code>/////<notice number>//
-		rnote left
-			__header__
-			- Version: //<api version>//
-			- AcquirerId: //<acquirer id>//
-			- Channel: //<channel>//
-			- TerminalId: //<terminal id>//
-		end note
-		
-	'!$client = NoticeSrv
-	'!include_many ../session/check.puml
-	
-	NoticeSrv -> NoticeSrv : Retrieve //<psp id>//, //<psp broker id>//, //<password>// by //<acquirer id>//
+	alt QR-code
+	    Client -> NoticeSrv : GET /paymentNotices///<qr code>//
+		    rnote left
+			    __header__
+			    - Version: //<api version>//
+			    - AcquirerId: //<acquirer id>//
+			    - Channel: //<channel>//
+			    - TerminalId: //<terminal id>//
+		    end note
 
+	    NoticeSrv -> NoticeSrv : parse //<qr code>//: //<pa tax code>//, //<notice number>//
+	else w/o QR-code
+        Client -> NoticeSrv : GET /paymentNotices///<pa tax code>/////<notice number>//
+		    rnote left
+			    __header__
+			    - Version: //<api version>//
+			    - AcquirerId: //<acquirer id>//
+			    - Channel: //<channel>//
+			    - TerminalId: //<terminal id>//
+		    end note
+	end
+
+	NoticeSrv -> NoticeSrv : Retrieve //<psp id>//, //<psp broker id>//, //<password>// by //<acquirer id>//
+	
 	NoticeSrv -> Nodo : POST /verifyPaymentNotice
 		rnote left
 			__request body__
