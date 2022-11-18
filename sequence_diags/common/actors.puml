@@ -18,7 +18,7 @@ end box
 
 box CDE/PCI Environment #GhostWhite
 	participant "PM-RTD" as PANTokenizer
-	participant "PM-Wallet" as WS
+	participant "PM-Wallet" as Wallet
 end box
 
 participant "PDV-Tokenizer" as Tokenizer
