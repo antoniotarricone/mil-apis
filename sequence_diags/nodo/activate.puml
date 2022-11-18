@@ -59,6 +59,7 @@ group#Gold activate
 
 	Nodo --> NoticeSrv : HTTP 200 (ok)
 		rnote left
+		    <font color="red">Currently the Nodo doesn't return the category of each transfer</font>
 			__response body__
 			<activatePaymentNoticeV2Response>
 			    <outcome>OK</outcome>
