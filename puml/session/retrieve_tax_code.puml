@@ -1,16 +1,16 @@
 group Retrieve tax code - <font color="red">Only for PagoBancomat PANs</font>
-	SessionSrv -> WS : GET /cards///<pan token>///taxCode
+	SessionSrv -> Wallet : GET /cards///<pan token>///taxCode
 		rnote left
 			__header__
 			- Version: //<api version>//
 		end note
 	
-	WS -> WS : Search the local DB
+	Wallet -> Wallet : Search the local DB
 		rnote left
 			Search completed successfully
 		end note
 	
-	WS --> SessionSrv : HTTP 200 (ok)
+	Wallet --> SessionSrv : HTTP 200 (ok)
 		rnote left
 			__response body__
 			{

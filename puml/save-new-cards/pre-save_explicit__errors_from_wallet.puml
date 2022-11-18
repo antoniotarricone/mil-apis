@@ -20,7 +20,7 @@ group pre-save
 	!$client = WalletWrp
 	!include_many ../session/check.puml
 	
-	WalletWrp -> WS : POST /cards
+	WalletWrp -> Wallet : POST /cards
 		rnote left
 			__header__
 			- Version: //<api version>//
@@ -32,7 +32,7 @@ group pre-save
 			}
 		end note
 	
-	WS --> WalletWrp : HTTP __not__ 201
+	Wallet --> WalletWrp : HTTP __not__ 201
 	
 	WalletWrp --> Client : HTTP 500 (server error)
 end

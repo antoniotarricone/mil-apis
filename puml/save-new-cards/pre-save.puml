@@ -1,5 +1,5 @@
 group Pre-save payment card in the Wallet
-	$client -> WS : POST /cards
+	$client -> Wallet : POST /cards
 	rnote left
 		__header__
 		- Version: //<api version>//
@@ -11,7 +11,7 @@ group Pre-save payment card in the Wallet
 		}
 	end note
 	
-	WS --> $client : HTTP *
+	Wallet --> $client : HTTP *
 	rnote left
 		<font color="red">The processing continues aside from HTTP status code</font>
 	end note
