@@ -22,6 +22,7 @@ paths:
       summary: Store the acceptance of T&C for the user identified by the tax code stored in the session
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'
         - $ref: 'common.yaml#/components/parameters/TerminalId'
@@ -55,6 +56,7 @@ paths:
       operationId: check
       summary: Check the acceptance of T&C for the user identified by the tax code
       parameters:
+        - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'

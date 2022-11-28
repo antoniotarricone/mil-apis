@@ -123,6 +123,14 @@ components:
         type: string
         example: "ATM"
 
+    RequestId:
+      name: RequestId
+      in: header
+      description: Request Id that will be logged by services
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+
     SessionId:
       name: id
       description: Session ID

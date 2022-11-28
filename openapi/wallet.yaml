@@ -22,6 +22,7 @@ paths:
       summary: Pre-save the payment card in the internal Wallet
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'
         - $ref: 'common.yaml#/components/parameters/TerminalId'

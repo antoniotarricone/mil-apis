@@ -18,6 +18,7 @@ security:
 paths:
   /sessions/{id}:
     parameters:
+      - $ref: 'common.yaml#/components/parameters/RequestId'
       - $ref: 'common.yaml#/components/parameters/Version'
       - $ref: 'common.yaml#/components/parameters/AcquirerId'
       - $ref: 'common.yaml#/components/parameters/Channel'
@@ -113,6 +114,7 @@ paths:
 
   /sessions:
     parameters:
+      - $ref: 'common.yaml#/components/parameters/RequestId'
       - $ref: 'common.yaml#/components/parameters/Version'
       - $ref: 'common.yaml#/components/parameters/AcquirerId'
       - $ref: 'common.yaml#/components/parameters/Channel'
@@ -189,6 +191,7 @@ paths:
       operationId: pair
       summary: Pair the session with IO
       parameters:
+        - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/Version'
       requestBody:
         $ref: '#/components/requestBodies/Pair'

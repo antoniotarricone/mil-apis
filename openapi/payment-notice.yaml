@@ -18,6 +18,7 @@ security:
 paths:
   /paymentNotices/{qrCode}:
     parameters:
+      - $ref: 'common.yaml#/components/parameters/RequestId'
       - $ref: 'common.yaml#/components/parameters/Version'
       - $ref: 'common.yaml#/components/parameters/AcquirerId'
       - $ref: 'common.yaml#/components/parameters/Channel'

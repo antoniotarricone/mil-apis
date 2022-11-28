@@ -21,6 +21,7 @@ paths:
       operationId: getServices
       summary: Return the list of services available for end-users
       parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'
