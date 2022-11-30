@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Fee Calculator Microservice
-  version: 1.0.0
+  version: 2.0.0
   description: Fee Calculator for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -35,7 +35,7 @@ paths:
         "200":
           $ref: '#/components/responses/FeeFound'
         "400":
-          $ref: 'common.yaml#/components/responses/ConstraintViolation'
+          $ref: 'common.yaml#/components/responses/Error'
         "401":
           description: API key is missing or invalid
         "403":
@@ -49,7 +49,7 @@ paths:
         "429":
           description: Too many request
         "500":
-          description: Server error
+          $ref: 'common.yaml#/components/responses/Error'
         default:
           description: Unexpected error
 

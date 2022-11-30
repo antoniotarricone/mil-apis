@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: PAN-to-Token Service and viceversa
-  version: 5.0.0
+  version: 6.0.0
   description: Service to create or retrieve, if it already exists, the token of a given PAN and viceversa
   contact:
     name: Antonio Tarricone
@@ -34,7 +34,7 @@ paths:
         "201":
           $ref: '#/components/responses/TokenRetrieved'
         "400":
-          $ref: 'common.yaml#/components/responses/ConstraintViolation'
+          $ref: 'common.yaml#/components/responses/Error'
         "401":
           description: API key is missing or invalid
         "403":
@@ -46,7 +46,7 @@ paths:
         "429":
           description: Too many request
         "500":
-          description: Server error
+          $ref: 'common.yaml#/components/responses/Error'
         default:
           description: Unexpected error
 
@@ -69,7 +69,7 @@ paths:
         "200":
           $ref: '#/components/responses/PanRetrieved'
         "400":
-          $ref: 'common.yaml#/components/responses/ConstraintViolation'
+          $ref: 'common.yaml#/components/responses/Error'
         "401":
           description: API key is missing or invalid
         "403":
@@ -81,7 +81,7 @@ paths:
         "429":
           description: Too many request
         "500":
-          description: Server error
+          $ref: 'common.yaml#/components/responses/Error'
         default:
           description: Unexpected error
 

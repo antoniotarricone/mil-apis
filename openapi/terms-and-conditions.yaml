@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Terms and Condition Microservice
-  version: 1.0.0
+  version: 2.0.0
   description: Terms and Condition Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -21,7 +21,7 @@ paths:
       operationId: accept
       summary: Store the acceptance of T&C for the user identified by the tax code stored in the session
       parameters:
-        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'
@@ -36,7 +36,7 @@ paths:
         "201":
           $ref: '#/components/responses/Stored'
         "400":
-          $ref: 'common.yaml#/components/responses/ConstraintViolation'
+          $ref: 'common.yaml#/components/responses/Error'
         "401":
           description: API key is missing or invalid
         "403":
@@ -46,7 +46,7 @@ paths:
         "429":
           description: Too many request
         "500":
-          description: Server error
+          $ref: 'common.yaml#/components/responses/Error'
         default:
           description: Unexpected error
 
@@ -56,7 +56,7 @@ paths:
       operationId: check
       summary: Check the acceptance of T&C for the user identified by the tax code
       parameters:
-        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'
@@ -71,7 +71,7 @@ paths:
         "200":
           $ref: '#/components/responses/Retrieved'
         "400":
-          $ref: 'common.yaml#/components/responses/ConstraintViolation'
+          $ref: 'common.yaml#/components/responses/Error'
         "401":
           description: API key is missing or invalid
         "403":
@@ -83,7 +83,7 @@ paths:
         "429":
           description: Too many request
         "500":
-          description: Server error
+          $ref: 'common.yaml#/components/responses/Error'
         default:
           description: Unexpected error
 

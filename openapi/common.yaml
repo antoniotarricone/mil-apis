@@ -1,6 +1,6 @@
 info:
   title: Common components
-  version: 2.1.0
+  version: 3.1.0
   description: Common components for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -14,6 +14,12 @@ components:
     # ------------------------------------------------------
     # Basic types
     # ------------------------------------------------------
+    Error:
+      description: Error code
+      type: string
+      pattern: "^[A-F0-9]{9}$"
+      example: "001000005"
+
     Message:
       description: Generic message containing XML 1.1 allowed characters
       type: string
@@ -66,22 +72,22 @@ components:
       example:
         message: "Terms and conditions has not yet been accepted"
 
-    Violations:
-      description: List of violations
+    Errors:
+      description: List of errors
       type: object
       additionalProperties: false
       properties:
-        violations:
+        errors:
           type: array
           maxItems: 32
           items:
-            $ref: '#/components/schemas/MessageObject'
+            $ref: '#/components/schemas/Error'
       required:
-        - violations
+        - errors
       example:
-        violations:
-          - message: "AcquirerId cannot be null"
-          - message: "Channel not allowed"
+        errors:
+          - "00000000A"
+          - "001000001"
 
   # ========================================================
   # Parameters
@@ -153,12 +159,12 @@ components:
   # Responses
   # ========================================================
   responses:
-    ConstraintViolation:
-      description: Bad request
+    Error:
+      description: Error response
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Violations'
+            $ref: '#/components/schemas/Errors'
 
   # ========================================================
   # Security schemes
@@ -169,13 +175,3 @@ components:
       description: This API uses API key
       name: Ocp-Apim-Subscription-Key
       in: header
-
-    oAuth2ClientCredentials:
-      type: oauth2
-      description: This API uses OAuth2 with Client Credentials Grant
-      flows:
-        clientCredentials:
-          tokenUrl: /oauth2/token/
-          scopes:
-            internal: The API cannot be invoked by clients (e.g. ATM Gateway)
-            external: The API can be invoked by clients (e.g. ATM Gateway)
