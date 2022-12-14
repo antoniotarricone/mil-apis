@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Session Microservice
-  version: 4.0.0
+  version: 4.0.1
   description: Session Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -191,7 +191,6 @@ paths:
       operationId: pair
       summary: Pair the session with IO
       parameters:
-        - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/Version'
       requestBody:
         $ref: '#/components/requestBodies/Pair'
