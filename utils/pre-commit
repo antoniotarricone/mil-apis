@@ -1,0 +1,36 @@
+#!/bin/sh
+
+echo ">> MERGE OF MULTI-FILES DESCRIPTOR <<"
+set +x
+
+# Descriptors to normalize.
+declare -a descriptors=(
+  "functions.yaml"
+  "fee.yaml"
+  "payment-notice.yaml"
+  "session.yaml"
+  "wallet.yaml"
+)
+
+# Prepare destination folder.
+rm -r openapi-mono
+mkdir openapi-mono
+
+# Loop on descriptors.
+for descriptor in "${descriptors[@]}"
+do
+   echo "$descriptor normalization..."
+   rm -r temp
+   mkdir temp
+   java \
+     -Dlogback.configurationFile=utils/logback.xml \
+     -jar utils/swagger-codegen-cli-3.0.36.jar generate \
+     -l openapi-yaml \
+     -i openapi/${descriptor} \
+     -o temp
+   cp temp/openapi.yaml openapi-mono/${descriptor}
+done
+
+rm -r temp
+
+git add openapi-mono/*.yaml
