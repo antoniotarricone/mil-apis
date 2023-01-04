@@ -1,36 +1,83 @@
 openapi: 3.0.3
-
 info:
   title: Services Microservice
-  version: 2.0.0
-  description: Handling of end-user services for Multi-channel Integration Layer of SW Client Project
+  description: Handling of end-user services for Multi-channel Integration Layer of
+    SW Client Project
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-
+  version: 2.0.0
 servers:
-  - description: Services URL
-    url: https://server_addr
-
+- url: https://server_addr
+  description: Services URL
 security:
-  - ApiKeyAuth: [ ]
-
+- ApiKeyAuth: []
 paths:
   /services:
     get:
-      operationId: getServices
       summary: Return the list of services available for end-users
+      operationId: getServices
       parameters:
-        - $ref: '#/components/parameters/RequestId'
-        - $ref: '#/components/parameters/Version'
-        - $ref: '#/components/parameters/AcquirerId'
-        - $ref: '#/components/parameters/Channel'
-        - $ref: '#/components/parameters/TerminalId'
+      - name: RequestId
+        in: header
+        description: Request Id that will be logged by services
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          maxLength: 64
+          pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\\
+            d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\
+            +([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+          type: string
+          example: 1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          pattern: "^\\d{1,11}$"
+          type: string
+          example: "4585625"
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          type: string
+          example: ATM
+          enum:
+          - ATM
+          - POS
+          - TOTEM
+          - CASH_REGISTER
+          - CSA
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique
+          per acquirer and channel.
+        required: true
+        schema:
+          pattern: "^[0-9a-zA-Z]{8}$"
+          type: string
+          example: 0aB9wXyZ
       responses:
         "200":
-          $ref: '#/components/responses/Services'
+          description: List of services retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
         "400":
-          $ref: '#/components/responses/Error'
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
         "401":
           description: API key is missing or invalid
         "403":
@@ -42,16 +89,19 @@ paths:
         "429":
           description: Too many request
         "500":
-          $ref: '#/components/responses/Error'
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
         default:
           description: Unexpected error
-
 components:
   schemas:
     Labels:
-      description: Description of the service
+      required:
+      - it
       type: object
-      additionalProperties: false
       properties:
         it:
           $ref: '#/components/schemas/Message'
@@ -63,155 +113,85 @@ components:
           $ref: '#/components/schemas/Message'
         es:
           $ref: '#/components/schemas/Message'
-      required:
-        - it
-      example:
-        it: "La tua posizione debitoria"
-        en: "Your debt position"
-
-    Service:
-      description: Details of a service
-      type: object
       additionalProperties: false
+      description: Description of the service
+      example:
+        it: La tua posizione debitoria
+        en: Your debt position
+    Service:
+      required:
+      - labels
+      - serviceId
+      type: object
       properties:
         labels:
           $ref: '#/components/schemas/Labels'
         serviceId:
           $ref: '#/components/schemas/UUID'
-      required:
-        - labels
-        - serviceId
+      additionalProperties: false
+      description: Details of a service
       example:
         labels:
-          it: "La tua posizione debitoria"
-          en: "Your debt position"
-        serviceId: "d0d654e6-97da-4848-b568-99fedccb642b"
-    
-    # ========================================================
-    # Following definitions were in 
-    # ========================================================
-    # ------------------------------------------------------
-    # Basic types
-    # ------------------------------------------------------
-    Error:
-      description: Error code
-      type: string
-      pattern: "^[A-F0-9]{9}$"
-      example: "001000005"
-
-    Message:
-      description: Generic message containing XML 1.1 allowed characters
-      type: string
-      pattern: "^[\u0001-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]{1,256}$"
-      example: "Session has not yet been created"
-
-    PanToken:
-      description: The token of the PAN
-      type: string
-      pattern: "^[a-zA-Z0-9]{1,32}$"
-      example: "517a4216840E461fB011036A0fd134E1"
-
-    PositiveInteger:
-      description: Non negative integer
-      type: integer
-      minimum: 1
-      example: 234
-
-    TaxCode:
-      description: Tax code of the payment card owner
-      type: string
-      pattern: "^([A-Z]{6}\\d{2}[A-Z]\\d{2}[A-Z]\\d{3}[A-Z])|(\\d{11})$"
-      example: "CHCZLN73D08A662B"
-
-    URI:
-      description: URI
-      type: string
-      format: uri
-      pattern: "^[ -~]{1,2048}$"
-
+          it: La tua posizione debitoria
+          en: Your debt position
+        serviceId: d0d654e6-97da-4848-b568-99fedccb642b
     UUID:
-      description: UUID
-      type: string
-      format: uuid
       pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-      example: "d0d654e6-97da-4848-b568-99fedccb642b"
-
-    # ------------------------------------------------------
-    # Complex types
-    # ------------------------------------------------------
-    MessageObject:
-      description: Object of generic message containing XML 1.1 allowed characters
-      type: object
-      additionalProperties: false
-      properties:
-        message:
-          $ref: '#/components/schemas/Message'
-      required:
-        - message
-      example:
-        message: "Terms and conditions has not yet been accepted"
-
+      type: string
+      description: UUID
+      format: uuid
+      example: d0d654e6-97da-4848-b568-99fedccb642b
     Errors:
-      description: List of errors
+      required:
+      - errors
       type: object
-      additionalProperties: false
       properties:
         errors:
-          type: array
           maxItems: 32
+          type: array
           items:
             $ref: '#/components/schemas/Error'
-      required:
-        - errors
+      additionalProperties: false
+      description: List of errors
       example:
         errors:
-          - "00000000A"
-          - "001000001"
-    # ========================================================
-
-  # ========================================================
-  # Following definitions were in 
-  # ========================================================
-  # ========================================================
-  # Parameters
-  # ========================================================
+        - 00000000A
+        - "001000001"
+    Error:
+      pattern: "^[A-F0-9]{9}$"
+      type: string
+      description: Error code
+      example: "001000005"
+    Message:
+      pattern: "^[\x01-퟿-�က0-ჿFF]{1,256}$"
+      type: string
+      description: Generic message containing XML 1.1 allowed characters
+      example: Session has not yet been created
+    inline_response_200:
+      required:
+      - services
+      type: object
+      properties:
+        services:
+          maxItems: 64
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+      additionalProperties: false
+  responses:
+    Services:
+      description: List of services retrieved successfully
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200'
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errors'
   parameters:
-    Version:
-      name: Version
-      in: header
-      description: Version of the required API
-      required: false
-      schema:
-        type: string
-        pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
-        maxLength: 64
-        example: "1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay"
-
-    AcquirerId:
-      name: AcquirerId
-      in: header
-      description: Acquirer ID assigned by PagoPA
-      required: true
-      schema:
-        type: string
-        pattern: "^\\d{1,11}$"
-        example: "4585625"
-
-    Channel:
-      name: Channel
-      in: header
-      description: Channel originating the request
-      required: true
-      schema:
-        enum:
-          - ATM
-          - POS
-          - TOTEM
-          - CASH_REGISTER
-          - CSA
-        type: string
-        example: "ATM"
-
     RequestId:
       name: RequestId
       in: header
@@ -219,64 +199,54 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/UUID'
-
-    SessionId:
-      name: id
-      description: Session ID
-      in: path
+    Version:
+      name: Version
+      in: header
+      description: Version of the required API
+      required: false
+      schema:
+        maxLength: 64
+        pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\\
+          d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\
+          +([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+        type: string
+        example: 1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
+    AcquirerId:
+      name: AcquirerId
+      in: header
+      description: Acquirer ID assigned by PagoPA
       required: true
       schema:
-        $ref: '#/components/schemas/UUID'
-
-    TerminalId:
-      name: TerminalId
+        pattern: "^\\d{1,11}$"
+        type: string
+        example: "4585625"
+    Channel:
+      name: Channel
       in: header
-      description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+      description: Channel originating the request
       required: true
       schema:
         type: string
+        example: ATM
+        enum:
+        - ATM
+        - POS
+        - TOTEM
+        - CASH_REGISTER
+        - CSA
+    TerminalId:
+      name: TerminalId
+      in: header
+      description: ID of the terminal originating the transaction. It must be unique
+        per acquirer and channel.
+      required: true
+      schema:
         pattern: "^[0-9a-zA-Z]{8}$"
-        example: "0aB9wXyZ"
-  # ========================================================
-
-  responses:
-    Services:
-      description: List of services retrieved successfully
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties: false
-            properties:
-              services:
-                type: array
-                maxItems: 64
-                items:
-                  $ref: '#/components/schemas/Service'
-            required:
-              - services
-    
-    # ========================================================
-    # Following definitions were in 
-    # ========================================================
-    Error:
-      description: Error response
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Errors'
-    # ========================================================
-
-  # ========================================================
-  # Following definition comes from  and
-  # replaces the original one.
-  # ========================================================
-  # ========================================================
-  # Security schemes
-  # ========================================================
+        type: string
+        example: 0aB9wXyZ
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
       description: This API uses API key
-      name: API-key
+      name: Ocp-Apim-Subscription-Key
       in: header
