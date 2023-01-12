@@ -6,7 +6,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 2.0.0
+  version: 3.0.0
 servers:
 - url: https://server_addr
   description: Wallet URL
@@ -65,6 +65,12 @@ paths:
           pattern: "^[0-9a-zA-Z]{8}$"
           type: string
           example: 0aB9wXyZ
+      - name: id
+        in: header
+        description: Session ID
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
       requestBody:
         content:
           application/json:
@@ -201,6 +207,13 @@ components:
         pattern: "^[0-9a-zA-Z]{8}$"
         type: string
         example: 0aB9wXyZ
+    HeaderSessionId:
+      name: id
+      in: header
+      description: Session ID
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

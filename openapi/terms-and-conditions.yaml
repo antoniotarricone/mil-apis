@@ -26,12 +26,7 @@ paths:
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'
         - $ref: 'common.yaml#/components/parameters/TerminalId'
-        - name: SessionId
-          in: header
-          description: ID of the session
-          required: true
-          schema:
-            $ref: 'common.yaml#/components/schemas/UUID'
+        - $ref: 'common.yaml#/components/parameters/HeaderSessionId'
       responses:
         "201":
           $ref: '#/components/responses/Stored'
