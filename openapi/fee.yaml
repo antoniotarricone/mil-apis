@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Fee Calculator Microservice
-  version: 2.0.0
+  version: 2.1.0
   description: Fee Calculator for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -28,6 +28,7 @@ paths:
         - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/MerchantId'
         - $ref: 'common.yaml#/components/parameters/TerminalId'
       requestBody:
         $ref: '#/components/requestBodies/GetFee'

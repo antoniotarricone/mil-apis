@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Wallet Microservice
-  version: 3.0.0
+  version: 3.1.0
   description: Wallet Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -25,6 +25,7 @@ paths:
         - $ref: 'common.yaml#/components/parameters/Version'
         - $ref: 'common.yaml#/components/parameters/AcquirerId'
         - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/MerchantId'
         - $ref: 'common.yaml#/components/parameters/TerminalId'
         - $ref: 'common.yaml#/components/parameters/HeaderSessionId'
       requestBody:

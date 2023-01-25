@@ -1,6 +1,6 @@
 info:
   title: Common components
-  version: 3.2.0
+  version: 3.3.0
   description: Common components for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -137,6 +137,16 @@ components:
       schema:
         $ref: '#/components/schemas/UUID'
     
+    MerchantId:
+      name: MerchantId
+      description: Merchant ID. Mandatory when Channel equals POS.
+      in: header
+      required: false
+      schema:
+        type: string
+        pattern: "^[0-9a-zA-Z]{1,15}$"
+        example: "28405fHfk73x88D"
+    
     RequestId:
       name: RequestId
       in: header
@@ -160,7 +170,7 @@ components:
       required: true
       schema:
         type: string
-        pattern: "^[0-9a-zA-Z]{8}$"
+        pattern: "^[0-9a-zA-Z]{1,8}$"
         example: "0aB9wXyZ"
 
   # ========================================================
