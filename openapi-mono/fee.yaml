@@ -5,7 +5,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 2.0.0
+  version: 2.1.0
 servers:
 - url: https://server_addr
   description: Fee Calculator URL
@@ -55,13 +55,21 @@ paths:
           - TOTEM
           - CASH_REGISTER
           - CSA
+      - name: MerchantId
+        in: header
+        description: Merchant ID. Mandatory when Channel equals POS.
+        required: false
+        schema:
+          pattern: "^[0-9a-zA-Z]{1,15}$"
+          type: string
+          example: 28405fHfk73x88D
       - name: TerminalId
         in: header
         description: ID of the terminal originating the transaction. It must be unique
           per acquirer and channel.
         required: true
         schema:
-          pattern: "^[0-9a-zA-Z]{8}$"
+          pattern: "^[0-9a-zA-Z]{1,8}$"
           type: string
           example: 0aB9wXyZ
       requestBody:
@@ -260,6 +268,15 @@ components:
         - TOTEM
         - CASH_REGISTER
         - CSA
+    MerchantId:
+      name: MerchantId
+      in: header
+      description: Merchant ID. Mandatory when Channel equals POS.
+      required: false
+      schema:
+        pattern: "^[0-9a-zA-Z]{1,15}$"
+        type: string
+        example: 28405fHfk73x88D
     TerminalId:
       name: TerminalId
       in: header
@@ -267,7 +284,7 @@ components:
         per acquirer and channel.
       required: true
       schema:
-        pattern: "^[0-9a-zA-Z]{8}$"
+        pattern: "^[0-9a-zA-Z]{1,8}$"
         type: string
         example: 0aB9wXyZ
   requestBodies:
