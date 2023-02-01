@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: PM-Wallet Service
-  version: 6.0.0
+  version: 7.0.0
   description: Service to handle payment cards Wallet in the PagoPA Ecosystem
   contact:
     name: Antonio Tarricone
@@ -122,6 +122,21 @@ paths:
 
 components:
   # ========================================================
+  # Schemas
+  # ========================================================
+  schemas:
+    # ------------------------------------------------------
+    # Basic types
+    # ------------------------------------------------------
+    Source:
+      description: Tax code source
+      enum:
+        - LOCAL_DB
+        - EXTERNAL
+      type: string
+      example: "LOCAL_DB"
+
+  # ========================================================
   # Request bodies
   # ========================================================
   requestBodies:
@@ -182,10 +197,14 @@ components:
             properties:
               taxCode:
                 $ref: 'common.yaml#/components/schemas/TaxCode'
+              source:
+                $ref: '#/components/schemas/Source'
             required:
               - taxCode
+              - source
             example:
               taxCode: "CHCZLN73D08A662B"
+              source: "LOCAL_DB"
 
   # ========================================================
   # Security schemes
