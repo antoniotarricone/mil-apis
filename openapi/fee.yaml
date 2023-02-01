@@ -9,8 +9,8 @@ info:
     email: antonio.tarricone@pagopa.it
 
 servers:
-  - description: Fee Calculator URL
-    url: https://server_addr
+  - description: DEV
+    url: https://mil-d-apim.azure-api.net/mil-fee-calculator
 
 security:
   - ApiKeyAuth: [ ]

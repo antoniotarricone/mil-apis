@@ -9,8 +9,8 @@ info:
     email: antonio.tarricone@pagopa.it
 
 servers:
-  - description: Payment Notice URL
-    url: https://server_addr
+  - description: DEV
+    url: https://mil-d-apim.azure-api.net/mil-payment-notice
 
 security:
   - ApiKeyAuth: [ ]

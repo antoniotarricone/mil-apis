@@ -8,8 +8,8 @@ info:
     email: antonio.tarricone@pagopa.it
   version: 2.1.0
 servers:
-- url: https://server_addr
-  description: Services URL
+- url: https://mil-d-apim.azure-api.net/mil-functions
+  description: DEV
 security:
 - ApiKeyAuth: []
 paths:
