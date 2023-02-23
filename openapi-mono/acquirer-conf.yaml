@@ -1,0 +1,184 @@
+openapi: 3.0.3
+info:
+  title: Acquirer Configuration Service
+  description: Handling the configuration of an Acquirer for Multi-channel Integration
+    Layer of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+  version: 1.0.1
+servers:
+- url: https://mil-d-apim.azure-api.net/mil-acquirer-conf
+  description: DEV
+security:
+- ApiKeyAuth: []
+paths:
+  /confs/{acquirerId}/psp:
+    get:
+      summary: Return the PSP data to communicate with Nodo and GEC
+      operationId: getPspConfig
+      tags: [ internal ]
+      parameters:
+      - name: RequestId
+        in: header
+        description: Request Id that will be logged by services
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          maxLength: 64
+          pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\\
+            d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\
+            +([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+          type: string
+          example: 1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
+      - name: acquirerId
+        in: path
+        description: Acquired ID
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: "^\\d{1,11}$"
+          type: string
+          example: "4585625"
+      responses:
+        "200":
+          description: PSP data to communicate with Nodo and GEC
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "400":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "429":
+          description: Too many request
+        "500":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        default:
+          description: Unexpected error
+components:
+  schemas:
+    PspConfig:
+      required:
+      - broker
+      - channel
+      - psp
+      type: object
+      properties:
+        psp:
+          pattern: "^[\x01-퟿-�က0-ჿFF]{1,35}$"
+          type: string
+        broker:
+          pattern: "^[\x01-퟿-�က0-ჿFF]{1,35}$"
+          type: string
+        channel:
+          pattern: "^[\x01-퟿-�က0-ჿFF]{1,35}$"
+          type: string
+        password:
+          pattern: "^[\x01-퟿-�က0-ჿFF]{8,15}$"
+          type: string
+      additionalProperties: false
+      description: PSP data to communicate with Nodo or GEC
+      example:
+        psp: AGID_01
+        broker: "97735020584"
+        channel: 97735020584_07
+        password: PLACEHOLDER
+    UUID:
+      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      type: string
+      description: UUID
+      format: uuid
+      example: d0d654e6-97da-4848-b568-99fedccb642b
+    Errors:
+      required:
+      - errors
+      type: object
+      properties:
+        errors:
+          maxItems: 32
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      additionalProperties: false
+      description: List of errors
+      example:
+        errors:
+        - 00000000A
+        - "001000001"
+    Error:
+      pattern: "^[A-F0-9]{9}$"
+      type: string
+      description: Error code
+      example: "001000005"
+    inline_response_200:
+      required:
+      - pspConfigForGetFeeAndClosePayment
+      - pspConfigForVerifyAndActivate
+      type: object
+      properties:
+        pspConfigForVerifyAndActivate:
+          $ref: '#/components/schemas/PspConfig'
+        pspConfigForGetFeeAndClosePayment:
+          $ref: '#/components/schemas/PspConfig'
+      additionalProperties: false
+  responses:
+    PspConfigs:
+      description: PSP data to communicate with Nodo and GEC
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_response_200'
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+  parameters:
+    RequestId:
+      name: RequestId
+      in: header
+      description: Request Id that will be logged by services
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    Version:
+      name: Version
+      in: header
+      description: Version of the required API
+      required: false
+      schema:
+        maxLength: 64
+        pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\\
+          d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\
+          +([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+        type: string
+        example: 1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: This API uses API key
+      name: Ocp-Apim-Subscription-Key
+      in: header
