@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Acquirer Configuration Service
-  version: 1.0.3
+  version: 1.0.0
   description: Handling the configuration of an Acquirer for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
