@@ -1,0 +1,102 @@
+openapi: 3.0.3
+
+info:
+  title: Acquirer Configuration Service
+  version: 1.0.0
+  description: Handling the configuration of an Acquirer for Multi-channel Integration Layer of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+  - description: DEV
+    url: https://mil-d-apim.azure-api.net/mil-acquirer-conf
+
+security:
+  - ApiKeyAuth: [ ]
+
+paths:
+  /confs/{acquirerId}/psp:
+    get:
+      operationId: getPspConfig
+      summary: Return the PSP data to communicate with Nodo and GEC
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - name: acquirerId
+          description: Acquired ID
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^\\d{1,11}$"
+            example: "4585625"
+      responses:
+        "200":
+          $ref: '#/components/responses/PspConfigs'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+components:
+  schemas:
+    PspConfig:
+      description: PSP data to communicate with Nodo or GEC
+      type: object
+      additionalProperties: false
+      properties:
+        psp:
+          type: string
+          pattern: "^[\u0001-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]{1,35}$"
+        broker:
+          type: string
+          pattern: "^[\u0001-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]{1,35}$"
+        channel:
+          type: string
+          pattern: "^[\u0001-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]{1,35}$"
+        password:
+          type: string
+          pattern: "^[\u0001-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]{8,15}$"
+      required:
+        - psp
+        - broker
+        - channel
+      example:
+        psp: "AGID_01"
+        broker: "97735020584"
+        channel: "97735020584_07"
+        password: "PLACEHOLDER"
+
+  responses:
+    PspConfigs:
+      description: PSP data to communicate with Nodo and GEC
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              pspConfigForVerifyAndActivate:
+                $ref: '#/components/schemas/PspConfig'
+              pspConfigForGetFeeAndClosePayment:
+                $ref: '#/components/schemas/PspConfig'
+            required:
+              - pspConfigForVerifyAndActivate
+              - pspConfigForGetFeeAndClosePayment
+
+  securitySchemes:
+    ApiKeyAuth:
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
