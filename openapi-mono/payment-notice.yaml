@@ -776,6 +776,7 @@ components:
       - EXPIRED_NOTICE
       - REVOKED_NOTICE
       - NOTICE_ALREADY_PAID
+      - UNKNOWN_NOTICE
       - UNEXPECTED_ERROR
     PaymentToken:
       pattern: "^[ -~]{1,35}$"

@@ -367,6 +367,7 @@ components:
         - EXPIRED_NOTICE              # Spiacenti, l’avviso è scaduto e non è più possibile pagarlo.
         - REVOKED_NOTICE              # Spiacenti, l’Ente Creditore ha revocato questo avviso.
         - NOTICE_ALREADY_PAID         # Questo avviso è stato già pagato!
+        - UNKNOWN_NOTICE              # Avviso sconosciuto.
         - UNEXPECTED_ERROR            # Spiacenti, si è verificato un errore imprevisto.
       example: "NOTICE_GLITCH"
 
