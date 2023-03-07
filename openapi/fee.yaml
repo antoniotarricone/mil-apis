@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Fee Calculator Microservice
-  version: 2.1.0
+  version: 2.2.0
   description: Fee Calculator for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -11,9 +11,10 @@ info:
 servers:
   - description: DEV
     url: https://mil-d-apim.azure-api.net/mil-fee-calculator
-
-security:
-  - ApiKeyAuth: [ ]
+  - description: DEV-EXT-SUB
+    url: https://mil-d-apim.azure-api.net/ext/sub/mil-fee-calculator
+  - description: DEV-EXT-AUT
+    url: https://mil-d-apim.azure-api.net/ext/aut/mil-fee-calculator
 
 paths:
   /fees:
@@ -23,6 +24,10 @@ paths:
     post:
       operationId: getFee
       summary: Calculate the fee amount for a set of payment notices
+      security: 
+        - ApiKeyAuth: []
+        - oAuthPassword: 
+          - getFee
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -141,3 +146,12 @@ components:
   securitySchemes:
     ApiKeyAuth:
       $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
+
+    oAuthPassword:
+      type: oauth2
+      description: This API uses OAuth 2 with Resource Owner Password Credentials when it is invoked by a trusted client
+      flows:
+        password:
+          tokenUrl: ../oauth2/token
+          scopes:
+            getFee: Calculate the fee amount for a set of payment notices

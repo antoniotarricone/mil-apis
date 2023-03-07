@@ -180,6 +180,6 @@ components:
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
-      description: This API uses API key
+      description: This API uses API key when it is invoked by a server application
       name: Ocp-Apim-Subscription-Key
       in: header

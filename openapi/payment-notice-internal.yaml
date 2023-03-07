@@ -1,0 +1,247 @@
+openapi: 3.0.3
+
+info:
+  title: Payment Notice Microservice
+  version: 1.0.0
+  description: Payment Notice Microservice for Multi-channel Integration Layer of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+  - description: DEV
+    url: https://mil-d-apim.azure-api.net/mil-payment-notice
+
+security:
+  - ApiKeyAuth: [ ]
+
+paths:
+  /payments/{transactionId}:
+    parameters:
+      - name: transactionId
+        description: Transaction ID
+        in: path
+        required: true
+        schema:
+          $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
+
+    # ------------------------------------------------------
+    # Receive from the Nodo the result of the payment of a
+    # set of payment notices
+    # ------------------------------------------------------
+    post:
+      operationId: receivePaymentStatus
+      tags: [ internal ]
+      summary: Receive from the Nodo the result of the payment of a set of payment notices. This API is invoked by the Nodo for sendPaymentResult.
+      requestBody:
+        $ref: '#/components/requestBodies/PaymentStatusByNodo'
+      responses:
+        "200":
+          $ref: '#/components/responses/PaymentStatusReceived'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          $ref: '#/components/responses/TransactionNotFound'
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "415":
+          description: Unsupported media type. Did you provide application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+components:
+  # ========================================================
+  # Schemas
+  # ========================================================
+  schemas:
+    # ------------------------------------------------------
+    # Basic types
+    # ------------------------------------------------------
+    AllOrNothingOutcome:
+      description: Dual values (OK or KO) outcome
+      type: string
+      enum:
+        - OK
+        - KO
+      example: "OK"
+
+    Company:
+      description: Name of the creditor company
+      type: string
+      pattern: "^[ -~]{1,140}$"
+      example: "ASL Roma"
+
+    CreditorReferenceId:
+      description: ID for the creditor company
+      type: string
+      pattern: "^[ -~]{1,35}$"
+      example: "4839d50603fssfW5X"
+
+    Debtor:
+      description: Debtor unstructured data
+      type: string
+      pattern: "^[ -~]{0,1024}$"
+      example: "Mario Rossi"
+
+    Description:
+      description: Payment notice description
+      type: string
+      pattern: "^[ -~]{1,140}$"
+      example: "Health ticket for chest x-ray"
+
+    Office:
+      description: Name of the creditor company office
+      type: string
+      pattern: "^[ -~]{1,140}$"
+      example: "Ufficio di Roma"
+
+    OkOutcome:
+      description: Constant value (OK) outcome
+      enum:
+        - OK
+      type: string
+      example: "OK"
+
+    PaymentToken:
+      description: ID of the payment activation
+      type: string
+      pattern: "^[ -~]{1,35}$"
+      example: "648fhg36s95jfg7DS"
+
+    TrxNotFoundOutcome:
+      description: Constant value (PAYMENT_NOT_FOUND) outcome
+      type: string
+      enum:
+        - PAYMENT_NOT_FOUND
+      example: "PAYMENT_NOT_FOUND"
+
+    # ------------------------------------------------------
+    # Common complex types
+    # ------------------------------------------------------
+    PaymentStatusByNodo:
+      description: Payment status communicated by the Nodo
+      type: object
+      additionalProperties: false
+      properties:
+        outcome:
+          $ref: '#/components/schemas/AllOrNothingOutcome'
+        paymentDate:
+          description: Notification timestamp
+          type: string
+          format: date-time
+          maxLength: 19
+        payments:
+          description: Details of payment notices
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/PaymentDetailsByNodo'
+      required:
+        - outcome
+        - paymentDate
+        - payments
+      example:
+        outcome: "OK"
+        paymentDate: "2022-11-12T08:53:55"
+        payments:
+          - paymentToken: "648fhg36s95jfg7DS"
+            description: "Health ticket for chest x-ray"
+            creditorReferenceId: "4839d50603fssfW5X"
+            fiscalCode: "15376371009"
+            company: "ASL Roma"
+            office: "Ufficio di Roma"
+            debtor: "Mario Rossi"
+
+    PaymentDetailsByNodo:
+      description: Details of a payment notice communicated by the Nodo
+      type: object
+      additionalProperties: false
+      properties:
+        paymentToken:
+          $ref: '#/components/schemas/PaymentToken'
+        description:
+          $ref: '#/components/schemas/Description'
+        creditorReferenceId:
+          $ref: '#/components/schemas/CreditorReferenceId'
+        fiscalCode:
+          $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
+        company:
+          $ref: '#/components/schemas/Company'
+        office:
+          $ref: '#/components/schemas/Office'
+        debtor:
+          $ref: '#/components/schemas/Debtor'
+      example:
+        paymentToken: "648fhg36s95jfg7DS"
+        description: "Health ticket for chest x-ray"
+        creditorReferenceId: "4839d50603fssfW5X"
+        fiscalCode: "15376371009"
+        company: "ASL Roma"
+        office: "Ufficio di Roma"
+        debtor: "Mario Rossi"
+
+  # ========================================================
+  # Request bodies
+  # ========================================================
+  requestBodies:
+    # ------------------------------------------------------
+    # For receivePaymentStatus
+    # ------------------------------------------------------
+    PaymentStatusByNodo:
+      description: Payment status communicated by the Nodo
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PaymentStatusByNodo'
+
+  # ========================================================
+  # Responses
+  # ========================================================
+  responses:
+    # ------------------------------------------------------
+    # For receivePaymentStatus
+    # ------------------------------------------------------
+    PaymentStatusReceived:
+      description: Payment status received
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              outcome:
+                $ref: '#/components/schemas/OkOutcome'
+            required:
+              - outcome
+            example:
+              outcome: "OK"
+
+    TransactionNotFound:
+      description: Transaction not found
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              outcome:
+                $ref: '#/components/schemas/TrxNotFoundOutcome'
+            required:
+              - outcome
+            example:
+              outcome: "PAYMENT_NOT_FOUND"
+
+  # ========================================================
+  # Security schemes
+  # ========================================================
+  securitySchemes:
+    ApiKeyAuth:
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'

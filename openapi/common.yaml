@@ -1,6 +1,6 @@
 info:
   title: Common components
-  version: 3.3.0
+  version: 3.4.0
   description: Common components for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -190,6 +190,7 @@ components:
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
-      description: This API uses API key
+      description: This API uses API key when it is invoked by a server application
       name: Ocp-Apim-Subscription-Key
       in: header
+ 

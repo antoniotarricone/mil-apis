@@ -6,12 +6,14 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 6.0.0
+  version: 7.0.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-payment-notice
   description: DEV
-security:
-- ApiKeyAuth: []
+- url: https://mil-d-apim.azure-api.net/ext/sub/mil-payment-notice
+  description: DEV-EXT-SUB
+- url: https://mil-d-apim.azure-api.net/ext/aut/mil-payment-notice
+  description: DEV-EXT-AUT
 paths:
   /paymentNotices/{qrCode}:
     get:
@@ -112,6 +114,10 @@ paths:
                 $ref: '#/components/schemas/Errors'
         default:
           description: Unexpected error
+      security:
+      - ApiKeyAuth: []
+      - oAuthPassword:
+        - verifyByQrCode
     patch:
       summary: Activate the payment of a notice by QR-code
       operationId: activateByQrCode
@@ -214,6 +220,10 @@ paths:
                 $ref: '#/components/schemas/Errors'
         default:
           description: Unexpected error
+      security:
+      - ApiKeyAuth: []
+      - oAuthPassword:
+        - activateByQrCode
   /paymentNotices/{paTaxCode}/{noticeNumber}:
     get:
       summary: Verify a payment notice by PA tax code and notice number
@@ -321,6 +331,10 @@ paths:
                 $ref: '#/components/schemas/Errors'
         default:
           description: Unexpected error
+      security:
+      - ApiKeyAuth: []
+      - oAuthPassword:
+        - verifyByTaxCodeAndNoticeNumber
     patch:
       summary: Activate the payment of a notice by PA tax code and notice number
       operationId: activateByTaxCodeAndNoticeNumber
@@ -431,6 +445,10 @@ paths:
                 $ref: '#/components/schemas/Errors'
         default:
           description: Unexpected error
+      security:
+      - ApiKeyAuth: []
+      - oAuthPassword:
+        - activateByTaxCodeAndNoticeNumber
   /payments:
     post:
       summary: Close the payment of a set of notices
@@ -551,6 +569,10 @@ paths:
                 $ref: '#/components/schemas/Errors'
         default:
           description: Unexpected error
+      security:
+      - ApiKeyAuth: []
+      - oAuthPassword:
+        - close
   /payments/{transactionId}:
     get:
       summary: Retrieve the status of the payment of a set of payment notices
@@ -650,58 +672,10 @@ paths:
                 $ref: '#/components/schemas/Errors'
         default:
           description: Unexpected error
-    post:
-      summary: Receive from the Nodo the result of the payment of a set of payment
-        notices. This API is invoked by the Nodo for sendPaymentResult.
-      operationId: receivePaymentStatus
-      parameters:
-      - name: transactionId
-        in: path
-        description: Transaction ID
-        required: true
-        style: simple
-        explode: false
-        schema:
-          $ref: '#/components/schemas/TransactionId'
-      requestBody:
-        $ref: '#/components/requestBodies/PaymentStatusByNodo'
-      responses:
-        "200":
-          description: Payment status received
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_200_3'
-        "400":
-          description: Error response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Errors'
-        "401":
-          description: API key is missing or invalid
-        "403":
-          description: Forbidden
-        "404":
-          description: Transaction not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/inline_response_404'
-        "406":
-          description: Not acceptable. Did you require application/json?
-        "415":
-          description: Unsupported media type. Did you provide application/json?
-        "429":
-          description: Too many request
-        "500":
-          description: Error response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Errors'
-        default:
-          description: Unexpected error
+      security:
+      - ApiKeyAuth: []
+      - oAuthPassword:
+        - getPaymentStatus
 components:
   schemas:
     AllOrNothingOutcome:
@@ -788,17 +762,6 @@ components:
       type: string
       description: String encoded by the QR-code
       example: PAGOPA|002|000000000000000000|00000000000|9999
-    TransactionId:
-      pattern: "^[a-zA-Z0-9]{1,255}$"
-      type: string
-      description: Transaction ID
-      example: 517a4216840E461fB011036A0fd134E1
-    TrxNotFoundOutcome:
-      type: string
-      description: Constant value (PAYMENT_NOT_FOUND) outcome
-      example: PAYMENT_NOT_FOUND
-      enum:
-      - PAYMENT_NOT_FOUND
     PaymentStatus:
       required:
       - outcome
@@ -856,66 +819,6 @@ components:
         description: Health ticket for chest x-ray
         creditorReferenceId: 4839d50603fssfW5X
         paTaxCode: "15376371009"
-        company: ASL Roma
-        office: Ufficio di Roma
-        debtor: Mario Rossi
-    PaymentStatusByNodo:
-      required:
-      - outcome
-      - paymentDate
-      - payments
-      type: object
-      properties:
-        outcome:
-          $ref: '#/components/schemas/AllOrNothingOutcome'
-        paymentDate:
-          maxLength: 19
-          type: string
-          description: Notification timestamp
-          format: date-time
-        payments:
-          maxItems: 5
-          type: array
-          description: Details of payment notices
-          items:
-            $ref: '#/components/schemas/PaymentDetailsByNodo'
-      additionalProperties: false
-      description: Payment status communicated by the Nodo
-      example:
-        outcome: OK
-        paymentDate: 2022-11-12T08:53:55
-        payments:
-        - paymentToken: 648fhg36s95jfg7DS
-          description: Health ticket for chest x-ray
-          creditorReferenceId: 4839d50603fssfW5X
-          fiscalCode: "15376371009"
-          company: ASL Roma
-          office: Ufficio di Roma
-          debtor: Mario Rossi
-    PaymentDetailsByNodo:
-      type: object
-      properties:
-        paymentToken:
-          $ref: '#/components/schemas/PaymentToken'
-        description:
-          $ref: '#/components/schemas/Description'
-        creditorReferenceId:
-          $ref: '#/components/schemas/CreditorReferenceId'
-        fiscalCode:
-          $ref: '#/components/schemas/PaTaxCode'
-        company:
-          $ref: '#/components/schemas/Company'
-        office:
-          $ref: '#/components/schemas/Office'
-        debtor:
-          $ref: '#/components/schemas/Debtor'
-      additionalProperties: false
-      description: Details of a payment notice communicated by the Nodo
-      example:
-        paymentToken: 648fhg36s95jfg7DS
-        description: Health ticket for chest x-ray
-        creditorReferenceId: 4839d50603fssfW5X
-        fiscalCode: "15376371009"
         company: ASL Roma
         office: Ufficio di Roma
         debtor: Mario Rossi
@@ -1023,6 +926,11 @@ components:
       type: integer
       description: Non negative integer
       example: 234
+    TransactionId:
+      pattern: "^[a-zA-Z0-9]{1,255}$"
+      type: string
+      description: Transaction ID
+      example: 517a4216840E461fB011036A0fd134E1
     EuroCents:
       maximum: 99999999999
       minimum: 1
@@ -1078,26 +986,6 @@ components:
       additionalProperties: false
       example:
         outcome: OK
-    inline_response_200_3:
-      required:
-      - outcome
-      type: object
-      properties:
-        outcome:
-          $ref: '#/components/schemas/OkOutcome'
-      additionalProperties: false
-      example:
-        outcome: OK
-    inline_response_404:
-      required:
-      - outcome
-      type: object
-      properties:
-        outcome:
-          $ref: '#/components/schemas/TrxNotFoundOutcome'
-      additionalProperties: false
-      example:
-        outcome: PAYMENT_NOT_FOUND
   responses:
     VerifyProcessed:
       description: Verify processed
@@ -1142,18 +1030,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/inline_response_200_2'
-    PaymentStatusReceived:
-      description: Payment status received
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/inline_response_200_3'
-    TransactionNotFound:
-      description: Transaction not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/inline_response_404'
     PaymentStatus:
       description: Payment status received
       content:
@@ -1292,15 +1168,26 @@ components:
               totalAmount: 12345
               fee: 50
               timestampOp: 2022-11-12T08:53:55
-    PaymentStatusByNodo:
-      description: Payment status communicated by the Nodo
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PaymentStatusByNodo'
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
-      description: This API uses API key
+      description: This API uses API key when it is invoked by a server application
       name: Ocp-Apim-Subscription-Key
       in: header
+    oAuthPassword:
+      type: oauth2
+      description: This API uses OAuth 2 with Resource Owner Password Credentials
+        when it is invoked by a trusted client
+      flows:
+        password:
+          tokenUrl: ../oauth2/token
+          scopes:
+            verifyByQrCode: Verify a payment notice by QR-code
+            activateByQrCode: Activate the payment of a notice by QR-code
+            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code
+              and notice number
+            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
+              PA tax code and notice number
+            close: Close the payment of a set of notices
+            getPaymentStatus: Retrieve the status of the payment of a set of payment
+              notices

@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Payment Notice Microservice
-  version: 6.0.0
+  version: 7.0.0
   description: Payment Notice Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -11,9 +11,10 @@ info:
 servers:
   - description: DEV
     url: https://mil-d-apim.azure-api.net/mil-payment-notice
-
-security:
-  - ApiKeyAuth: [ ]
+  - description: DEV-EXT-SUB
+    url: https://mil-d-apim.azure-api.net/ext/sub/mil-payment-notice
+  - description: DEV-EXT-AUT
+    url: https://mil-d-apim.azure-api.net/ext/aut/mil-payment-notice
 
 paths:
   /paymentNotices/{qrCode}:
@@ -37,6 +38,10 @@ paths:
     get:
       operationId: verifyByQrCode
       summary: Verify a payment notice by QR-code
+      security: 
+        - ApiKeyAuth: []
+        - oAuthPassword: 
+          - verifyByQrCode
       responses:
         "200":
           $ref: '#/components/responses/VerifyProcessed'
@@ -63,6 +68,10 @@ paths:
     patch:
       operationId: activateByQrCode
       summary: Activate the payment of a notice by QR-code
+      security: 
+        - ApiKeyAuth: []
+        - oAuthPassword: 
+          - activateByQrCode
       requestBody:
         $ref: '#/components/requestBodies/Activate'
       responses:
@@ -115,6 +124,10 @@ paths:
     get:
       operationId: verifyByTaxCodeAndNoticeNumber
       summary: Verify a payment notice by PA tax code and notice number
+      security: 
+        - ApiKeyAuth: []
+        - oAuthPassword: 
+          - verifyByTaxCodeAndNoticeNumber
       responses:
         "200":
           $ref: '#/components/responses/VerifyProcessed'
@@ -142,6 +155,10 @@ paths:
     patch:
       operationId: activateByTaxCodeAndNoticeNumber
       summary: Activate the payment of a notice by PA tax code and notice number
+      security: 
+        - ApiKeyAuth: []
+        - oAuthPassword: 
+          - activateByTaxCodeAndNoticeNumber
       requestBody:
         $ref: '#/components/requestBodies/Activate'
       responses:
@@ -173,6 +190,10 @@ paths:
     post:
       operationId: close
       summary: Close the payment of a set of notices
+      security: 
+        - ApiKeyAuth: []
+        - oAuthPassword: 
+          - close
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -211,38 +232,7 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/TransactionId'
-
-    # ------------------------------------------------------
-    # Receive from the Nodo the result of the payment of a
-    # set of payment notices
-    # ------------------------------------------------------
-    post:
-      operationId: receivePaymentStatus
-      summary: Receive from the Nodo the result of the payment of a set of payment notices. This API is invoked by the Nodo for sendPaymentResult.
-      requestBody:
-        $ref: '#/components/requestBodies/PaymentStatusByNodo'
-      responses:
-        "200":
-          $ref: '#/components/responses/PaymentStatusReceived'
-        "400":
-          $ref: 'common.yaml#/components/responses/Error'
-        "401":
-          description: API key is missing or invalid
-        "403":
-          description: Forbidden
-        "404":
-          $ref: '#/components/responses/TransactionNotFound'
-        "406":
-          description: Not acceptable. Did you require application/json?
-        "415":
-          description: Unsupported media type. Did you provide application/json?
-        "429":
-          description: Too many request
-        "500":
-          $ref: 'common.yaml#/components/responses/Error'
-        default:
-          description: Unexpected error
+          $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
 
     # ------------------------------------------------------
     # Retrieve the status of the payment of a set of payment
@@ -251,6 +241,10 @@ paths:
     get:
       operationId: getPaymentStatus
       summary: Retrieve the status of the payment of a set of payment notices
+      security: 
+        - ApiKeyAuth: []
+        - oAuthPassword: 
+          - getPaymentStatus
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -383,19 +377,6 @@ components:
       pattern: "^[ -~]{6}\\|[ -~]{3}\\|[0-9]{18}\\|[0-9]{11}\\|[0-9]{2,11}$"
       example: "PAGOPA|002|000000000000000000|00000000000|9999"
 
-    TransactionId:
-      description: Transaction ID
-      type: string
-      pattern: "^[a-zA-Z0-9]{1,255}$"
-      example: "517a4216840E461fB011036A0fd134E1"
-
-    TrxNotFoundOutcome:
-      description: Constant value (PAYMENT_NOT_FOUND) outcome
-      type: string
-      enum:
-        - PAYMENT_NOT_FOUND
-      example: "PAYMENT_NOT_FOUND"
-
     # ------------------------------------------------------
     # Common complex types
     # ------------------------------------------------------
@@ -457,68 +438,6 @@ components:
         description: "Health ticket for chest x-ray"
         creditorReferenceId: "4839d50603fssfW5X"
         paTaxCode: "15376371009"
-        company: "ASL Roma"
-        office: "Ufficio di Roma"
-        debtor: "Mario Rossi"
-
-    PaymentStatusByNodo:
-      description: Payment status communicated by the Nodo
-      type: object
-      additionalProperties: false
-      properties:
-        outcome:
-          $ref: '#/components/schemas/AllOrNothingOutcome'
-        paymentDate:
-          description: Notification timestamp
-          type: string
-          format: date-time
-          maxLength: 19
-        payments:
-          description: Details of payment notices
-          type: array
-          maxItems: 5
-          items:
-            $ref: '#/components/schemas/PaymentDetailsByNodo'
-      required:
-        - outcome
-        - paymentDate
-        - payments
-      example:
-        outcome: "OK"
-        paymentDate: "2022-11-12T08:53:55"
-        payments:
-          - paymentToken: "648fhg36s95jfg7DS"
-            description: "Health ticket for chest x-ray"
-            creditorReferenceId: "4839d50603fssfW5X"
-            fiscalCode: "15376371009"
-            company: "ASL Roma"
-            office: "Ufficio di Roma"
-            debtor: "Mario Rossi"
-
-    PaymentDetailsByNodo:
-      description: Details of a payment notice communicated by the Nodo
-      type: object
-      additionalProperties: false
-      properties:
-        paymentToken:
-          $ref: '#/components/schemas/PaymentToken'
-        description:
-          $ref: '#/components/schemas/Description'
-        creditorReferenceId:
-          $ref: '#/components/schemas/CreditorReferenceId'
-        fiscalCode:
-          $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
-        company:
-          $ref: '#/components/schemas/Company'
-        office:
-          $ref: '#/components/schemas/Office'
-        debtor:
-          $ref: '#/components/schemas/Debtor'
-      example:
-        paymentToken: "648fhg36s95jfg7DS"
-        description: "Health ticket for chest x-ray"
-        creditorReferenceId: "4839d50603fssfW5X"
-        fiscalCode: "15376371009"
         company: "ASL Roma"
         office: "Ufficio di Roma"
         debtor: "Mario Rossi"
@@ -643,7 +562,7 @@ components:
               paymentMethod:
                 $ref: 'common-payment-notice.yaml#/components/schemas/PaymentMethod'
               transactionId:
-                $ref: '#/components/schemas/TransactionId'
+                $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
               totalAmount:
                 $ref: 'common-payment-notice.yaml#/components/schemas/EuroCents'
               fee:
@@ -670,16 +589,6 @@ components:
               totalAmount: 12345
               fee: 50
               timestampOp: "2022-11-12T08:53:55"
-
-    # ------------------------------------------------------
-    # For receivePaymentStatus
-    # ------------------------------------------------------
-    PaymentStatusByNodo:
-      description: Payment status communicated by the Nodo
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PaymentStatusByNodo'
 
   # ========================================================
   # Responses
@@ -745,39 +654,6 @@ components:
               outcome: "OK"
 
     # ------------------------------------------------------
-    # For receivePaymentStatus
-    # ------------------------------------------------------
-    PaymentStatusReceived:
-      description: Payment status received
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties: false
-            properties:
-              outcome:
-                $ref: '#/components/schemas/OkOutcome'
-            required:
-              - outcome
-            example:
-              outcome: "OK"
-
-    TransactionNotFound:
-      description: Transaction not found
-      content:
-        application/json:
-          schema:
-            type: object
-            additionalProperties: false
-            properties:
-              outcome:
-                $ref: '#/components/schemas/TrxNotFoundOutcome'
-            required:
-              - outcome
-            example:
-              outcome: "PAYMENT_NOT_FOUND"
-
-    # ------------------------------------------------------
     # For getPaymentStatus
     # ------------------------------------------------------
     PaymentStatus:
@@ -793,3 +669,17 @@ components:
   securitySchemes:
     ApiKeyAuth:
       $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
+       
+    oAuthPassword:
+      type: oauth2
+      description: This API uses OAuth 2 with Resource Owner Password Credentials when it is invoked by a trusted client
+      flows:
+        password:
+          tokenUrl: ../oauth2/token
+          scopes:
+            verifyByQrCode: Verify a payment notice by QR-code
+            activateByQrCode: Activate the payment of a notice by QR-code
+            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code and notice number
+            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by PA tax code and notice number
+            close: Close the payment of a set of notices
+            getPaymentStatus: Retrieve the status of the payment of a set of payment notices
