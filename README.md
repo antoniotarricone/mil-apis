@@ -1,5 +1,5 @@
 # Multi-channel Integration Layer APIs
-OpenAPI descriptors of the services that make up the Multi-channel Intagration Layer of SW Client project.
+OpenAPI descriptors of the services that make up the Multi-channel Integration Layer of SW Client project.
 
 ## WARNING
 Azure API Manager does not accept OpenAPI descriptors with references to other files.
