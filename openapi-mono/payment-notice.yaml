@@ -6,7 +6,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 7.0.0
+  version: 8.0.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-payment-notice
   description: DEV
@@ -224,7 +224,7 @@ paths:
       - ApiKeyAuth: []
       - oAuthPassword:
         - activateByQrCode
-  /paymentNotices/{paTaxCode}/{noticeNumber}:
+  /paymentNoticesDec/{paTaxCode}/{noticeNumber}:
     get:
       summary: Verify a payment notice by PA tax code and notice number
       operationId: verifyByTaxCodeAndNoticeNumber
@@ -836,7 +836,9 @@ components:
     VerifyOk:
       required:
       - amount
+      - noticeNumber
       - outcome
+      - paTaxCode
       type: object
       properties:
         outcome:
@@ -853,10 +855,16 @@ components:
           $ref: '#/components/schemas/Company'
         office:
           $ref: '#/components/schemas/Office'
+        paTaxCode:
+          $ref: '#/components/schemas/PaTaxCode'
+        noticeNumber:
+          $ref: '#/components/schemas/NoticeNumber'
       description: Response to verify payment notice when all went ok
       example:
         outcome: OK
         amount: 12345
+        paTaxCode: "15376371009"
+        noticeNumber: "485564829563528563"
     ActivateOk:
       required:
       - paymentToken

@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Payment Notice Microservice
-  version: 7.0.0
+  version: 8.0.0
   description: Payment Notice Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -96,7 +96,7 @@ paths:
         default:
           description: Unexpected error
 
-  /paymentNotices/{paTaxCode}/{noticeNumber}:
+  /paymentNoticesDec/{paTaxCode}/{noticeNumber}:
     parameters:
       - $ref: 'common.yaml#/components/parameters/RequestId'
       - $ref: 'common.yaml#/components/parameters/Version'
@@ -475,12 +475,20 @@ components:
           $ref: '#/components/schemas/Company'
         office:
           $ref: '#/components/schemas/Office'
+        paTaxCode:
+          $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
+        noticeNumber:
+          $ref: '#/components/schemas/NoticeNumber'
       required:
         - outcome
         - amount
+        - paTaxCode
+        - noticeNumber
       example:
         outcome: "OK"
         amount: 12345
+        paTaxCode: "15376371009"
+        noticeNumber: "485564829563528563"
 
     # ------------------------------------------------------
     # Complex types for activateByQrCode and
