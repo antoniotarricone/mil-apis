@@ -380,7 +380,7 @@ components:
     QrCodeBase64UrlEnc:
       description: Base64Url of the string encoded by the QR-code. This is due to a bug of Azure routing system which decodes %2F before routing the request.
       type: string
-      pattern: "^[a-zA-Z0-9_-]{62}$"
+      pattern: "^[a-zA-Z0-9_-]{62,71}$"
       example: "UEFHT1BBfDAwMnwwMDAwMDAwMDAwMDAwMDAwMDB8MDAwMDAwMDAwMDB8OTk5OQ"
 
     # ------------------------------------------------------
