@@ -1,0 +1,600 @@
+openapi: 3.0.3
+info:
+  title: Identity Provider Microservice
+  description: Identity Provider Microservice for Multi-channel Integration Layer
+    of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+  version: 1.0.0
+servers:
+- url: https://mil-d-apim.azure-api.net/mil-idp
+  description: DEV
+paths:
+  /pwd/token:
+    post:
+      summary: Return access token by means of resource owner password or refresh
+        token
+      operationId: getAccessTokenByPassword
+      parameters:
+      - name: RequestId
+        in: header
+        description: Request Id that will be logged by services
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          maxLength: 64
+          pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\\
+            d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\
+            +([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+          type: string
+          example: 1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          pattern: "^\\d{1,11}$"
+          type: string
+          example: "4585625"
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          type: string
+          example: ATM
+          enum:
+          - ATM
+          - POS
+          - TOTEM
+          - CASH_REGISTER
+          - CSA
+      - name: MerchantId
+        in: header
+        description: Merchant ID. Mandatory when Channel equals POS.
+        required: false
+        schema:
+          pattern: "^[0-9a-zA-Z]{1,15}$"
+          type: string
+          example: 28405fHfk73x88D
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique
+          per acquirer and channel.
+        required: true
+        schema:
+          pattern: "^[0-9a-zA-Z]{1,8}$"
+          type: string
+          example: 0aB9wXyZ
+      requestBody:
+        $ref: '#/components/requestBodies/GetAccessTokenByPassword'
+      responses:
+        "201":
+          description: Response provided when an access token is requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+        "400":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        "401":
+          description: Wrong credentials.
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "415":
+          description: Unsupported media type. Did you provide application/x-www-form-urlencoded?
+        "429":
+          description: Too many request
+        "500":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        default:
+          description: Unexpected error
+      security: []
+  /clt/token:
+    post:
+      summary: "Return access token by means of client credentials (modified, instead\
+        \ of client_secret, API key is used)"
+      operationId: getAccessTokenByApiKey
+      parameters:
+      - name: RequestId
+        in: header
+        description: Request Id that will be logged by services
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      - name: Version
+        in: header
+        description: Version of the required API
+        required: false
+        schema:
+          maxLength: 64
+          pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\\
+            d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\
+            +([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+          type: string
+          example: 1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
+      - name: AcquirerId
+        in: header
+        description: Acquirer ID assigned by PagoPA
+        required: true
+        schema:
+          pattern: "^\\d{1,11}$"
+          type: string
+          example: "4585625"
+      - name: Channel
+        in: header
+        description: Channel originating the request
+        required: true
+        schema:
+          type: string
+          example: ATM
+          enum:
+          - ATM
+          - POS
+          - TOTEM
+          - CASH_REGISTER
+          - CSA
+      - name: MerchantId
+        in: header
+        description: Merchant ID. Mandatory when Channel equals POS.
+        required: false
+        schema:
+          pattern: "^[0-9a-zA-Z]{1,15}$"
+          type: string
+          example: 28405fHfk73x88D
+      - name: TerminalId
+        in: header
+        description: ID of the terminal originating the transaction. It must be unique
+          per acquirer and channel.
+        required: true
+        schema:
+          pattern: "^[0-9a-zA-Z]{1,8}$"
+          type: string
+          example: 0aB9wXyZ
+      requestBody:
+        $ref: '#/components/requestBodies/GetAccessTokenByApiKey'
+      responses:
+        "201":
+          description: Response provided when an access token is requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessTokenWoRefresh'
+        "400":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        "401":
+          description: Wrong credentials.
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "415":
+          description: Unsupported media type. Did you provide application/x-www-form-urlencoded?
+        "429":
+          description: Too many request
+        "500":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        default:
+          description: Unexpected error
+      security:
+      - ApiKeyAuth: []
+  /.well-known/jwks.json:
+    get:
+      summary: Return public keys
+      operationId: getJwks
+      responses:
+        "200":
+          description: Public keys
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicKeys'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "429":
+          description: Too many request
+        "500":
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        default:
+          description: Unexpected error
+      security: []
+components:
+  schemas:
+    BearerTokenType:
+      type: string
+      description: Token type for bearer token
+      example: Bearer
+      enum:
+      - Bearer
+    ClientCredentialsGrantType:
+      type: string
+      description: Grant type to get an access token with client credentials
+      example: client_credentials
+      enum:
+      - client_credentials
+    KeyType:
+      type: string
+      description: Key type
+      example: RSA
+      enum:
+      - RSA
+    Modulus:
+      pattern: "^[a-zA-Z0-9_-]{2,1365}$"
+      type: string
+      description: Modulus
+      example: qjcVEWJTTySeKxHsJSsmVGk2cEvXJ4tBC4uyU5MxYwBAiIWuZb_yDOIjLz7JN8QsJs3QrZtS3vqv18ljW2db6ED90OUo9CVJveSF4eNRozDHOvnHGT0HR-8Wf5GxcNy63zfQLrnfdp5F9TrhMFRMkEA0TCT7PhT3yF6YvwLtQyMciER1_KKnpGomfAkW-UpaF2nHfXiFPrOIHMuNb5BoRR1f0349tqloLgLd7vyMy1jg-BldmEgRV1bcFqjH0Cg3leROjDy9HzdFauRIlSb4VZrqNni2hgaTUHI5Xp7aCwpS9Y_mf19KpxN0_8d-f3UVRlwtI1dryelpdC5jowxia2Pf8UgSZyMs2ZxDf6eU0SH8wHEvMpeFpwmiBD1XcsISoTan0Yv7w_CLo6JOqX6EfogDQZUBzKKlVCZSoSinAz0_7Bj2orgWKQ9sbfgJWgJweKkJLH-bNSRaVcu02boxPnlJeay3wROhSAgtiKWZnsU1_FpPNG0JBFCh_x-VjkuBoREpNEyJM5NvhRCmyObtzocS4eCtAgvmo3EFv_Xa-rp0p5ez4A-_QUb5OsYOswqYbIV1GbtiAfCTOrNbv6K86LaTllZ9WqYrKgDv7KA-604K37k33LHROqcO9Q-bCN8hKzQDWs7M3DFNP6P5iBUUVs-gtWncHvIuUWTth-fBXa8
+    OfflineAccessScope:
+      type: string
+      description: Scope for offline_access
+      example: offline_access
+      enum:
+      - offline_access
+    Password:
+      pattern: "^[ -~]{1,64}$"
+      type: string
+      description: User password
+      example: Password-001$
+    PasswordGrantType:
+      type: string
+      description: Grant type to get an access token with resource owner password
+      example: password
+      enum:
+      - password
+    PublicExponent:
+      pattern: "^[a-zA-Z0-9_-]{2,1365}$"
+      type: string
+      description: Public key exponent
+      example: AQAB
+    PublicKeyUse:
+      type: string
+      description: Public key use
+      example: sig
+      enum:
+      - sig
+      - enc
+    RefreshGrantType:
+      type: string
+      description: Grant type to refresh an access token
+      example: refresh_token
+      enum:
+      - refresh_token
+    Token:
+      pattern: "^[a-zA-Z0-9_-]{1,1024}\\.[a-zA-Z0-9_-]{1,1024}\\.[a-zA-Z0-9_-]{1,1024}$"
+      type: string
+      description: Token
+      example: eyJraWQiOiI2OWQzZDEwZi03MGRhLTQ5ODItYjI4ZC03MmU4MTQ4MzI4YTMiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pbC1kLWFwaW0uYXp1cmUtYXBpLm5ldC9taWwtaWRwIiwiYXVkIjpbImh0dHBzOi8vbWlsLWQtYXBpbS5henVyZS1hcGkubmV0L21pbC1wYXltZW50LW5vdGljZSIsImh0dHBzOi8vbWlsLWQtYXBpbS5henVyZS1hcGkubmV0L21pbC1mZWUtY2FsY3VsYXRvciJdLCJleHAiOjE2Nzg3ODkyOTUsInNjb3BlIjoidmVyaWZ5QnlRckNvZGUgYWN0aXZhdGVCeVFyQ29kZSB2ZXJpZnlCeVRheENvZGVBbmROb3RpY2VOdW1iZXIgYWN0aXZhdGVCeVRheENvZGVBbmROb3RpY2VOdW1iZXIgY2xvc2UgZ2V0UGF5bWVudFN0YXR1cyBnZXRGZWUifQ.UJ8Vwv0NwF5S3fajgsdpgV-t6VeZAVC9dR0QGVpevC6Rw35tTx_1pJq2kI0GVAp0Vm7mNmgpZgzqx14QJfBmtTz3ZMJuUYVJUfHHQxxRxEyVBslrloOCqc8LfFkC-jmVQG5_9p9f6Tb7MB-h9J_f9ivtFX9gz7jK2Q_llD3HU0FujMgHEJiloKl7sp2uDaMIiy9dOKT7m0M6sA1tA84kwuJASudd_KWotideFsiA8LMBy_fGlEO7ogF-WytXD0XfW6VIBwQKq5KB3L3HxUuOZE1Gr2hubZ9SCeGAptiaPCWeEDf4w4x3IvKUL-rmm4bs4xalCmUbWcnTkKJi5f4N_8d2aRBrCL7k01rEK-OI1NH1-cCCk97eanNxvFEAKk_9t8rggipYt9BuL929p11LHVeYqqfemz1yrzc58LJXWPNgSMZ8XjKoITzsEiKWtGMYNV6GodJs_USnMKGIlc_uynZS0Q9mUV5IWhFaOZWFkM1nNwebMq9edg-kxtj1WpNkXfP1lahOMt36a9Rn2rWBLAhMBnerigsxFmUpi90EmbDkgOKTEXd3adOWLBb0jQSw0gPlNHe4bHh_LxBNNWljd6P9yZ4CYvZsWFwt_85d-PS56y-mNWV5oFMgPd-_qeF3Fn-QMj3Q5qySoqNCLzX7pnqjzXrveazLcR-CrroIUGM
+    Username:
+      pattern: "^[ -~]{1,64}$"
+      type: string
+      description: User name
+      example: Merchant-001
+    AccessToken:
+      required:
+      - access_token
+      - expires_in
+      - token_type
+      type: object
+      properties:
+        access_token:
+          $ref: '#/components/schemas/Token'
+        refresh_token:
+          $ref: '#/components/schemas/Token'
+        token_type:
+          $ref: '#/components/schemas/BearerTokenType'
+        expires_in:
+          $ref: '#/components/schemas/PositiveInteger'
+      additionalProperties: false
+      description: Data returned when a new access token is requested
+      example:
+        access_token: eyJraWQiOiI2OWQzZDEwZi03MGRhLTQ5ODItYjI4ZC03MmU4MTQ4MzI4YTMiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pbC1kLWFwaW0uYXp1cmUtYXBpLm5ldC9taWwtaWRwIiwiYXVkIjpbImh0dHBzOi8vbWlsLWQtYXBpbS5henVyZS1hcGkubmV0L21pbC1wYXltZW50LW5vdGljZSIsImh0dHBzOi8vbWlsLWQtYXBpbS5henVyZS1hcGkubmV0L21pbC1mZWUtY2FsY3VsYXRvciJdLCJleHAiOjE2Nzg3ODkyOTUsInNjb3BlIjoidmVyaWZ5QnlRckNvZGUgYWN0aXZhdGVCeVFyQ29kZSB2ZXJpZnlCeVRheENvZGVBbmROb3RpY2VOdW1iZXIgYWN0aXZhdGVCeVRheENvZGVBbmROb3RpY2VOdW1iZXIgY2xvc2UgZ2V0UGF5bWVudFN0YXR1cyBnZXRGZWUifQ.UJ8Vwv0NwF5S3fajgsdpgV-t6VeZAVC9dR0QGVpevC6Rw35tTx_1pJq2kI0GVAp0Vm7mNmgpZgzqx14QJfBmtTz3ZMJuUYVJUfHHQxxRxEyVBslrloOCqc8LfFkC-jmVQG5_9p9f6Tb7MB-h9J_f9ivtFX9gz7jK2Q_llD3HU0FujMgHEJiloKl7sp2uDaMIiy9dOKT7m0M6sA1tA84kwuJASudd_KWotideFsiA8LMBy_fGlEO7ogF-WytXD0XfW6VIBwQKq5KB3L3HxUuOZE1Gr2hubZ9SCeGAptiaPCWeEDf4w4x3IvKUL-rmm4bs4xalCmUbWcnTkKJi5f4N_8d2aRBrCL7k01rEK-OI1NH1-cCCk97eanNxvFEAKk_9t8rggipYt9BuL929p11LHVeYqqfemz1yrzc58LJXWPNgSMZ8XjKoITzsEiKWtGMYNV6GodJs_USnMKGIlc_uynZS0Q9mUV5IWhFaOZWFkM1nNwebMq9edg-kxtj1WpNkXfP1lahOMt36a9Rn2rWBLAhMBnerigsxFmUpi90EmbDkgOKTEXd3adOWLBb0jQSw0gPlNHe4bHh_LxBNNWljd6P9yZ4CYvZsWFwt_85d-PS56y-mNWV5oFMgPd-_qeF3Fn-QMj3Q5qySoqNCLzX7pnqjzXrveazLcR-CrroIUGM
+        refresh_token: eyJraWQiOiIxN2YwNWViZC1hMWMzLTRjNWMtODM4Ny1jOWZlNjU4MDRiMDEiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pbC1kLWFwaW0uYXp1cmUtYXBpLm5ldC9taWwtaWRwIiwiYXVkIjoiaHR0cHM6Ly9taWwtZC1hcGltLmF6dXJlLWFwaS5uZXQvbWlsLWlkcCIsImV4cCI6MTY3ODg4MTA1NSwic2NvcGUiOiJvZmZsaW5lX2FjY2VzcyJ9.Bu-BXKRMoE8fdBfuoPAa70WQYUWVH3BK3VFMw-9mr7hGlKBSONXQY8vcrFuh4OLm6vHX2hUagYuJ3yS_Anm5AHU8Kpay0dGm30fyPxFAyv5s_Yn_ET3VExPZBedBSlHl0Rzt0JQ_9X07X0JkCwWacxWMueKNoVndAh3QxswbkwtEANAKvQcvAtdLjh-93eDYFq0vvS8qNRReTZf46fldIL9H5-0MMqjfVi5A6y8YCzx7_kOHKq8wCy7u75QtKhPRzYnY0JcBVMALZgQovpCYpnlPkP3JV3cgdmlDGWmGHbKQz9iQ5bY1071e3vhxqR2iEqFJwn7nohYq9sxkMQGxNxz2BI-w3v_SQ3zS3mI1qK_qm1c7yzyF3c_lB920T5hBup9RozIXVb2OkX38pW6JKORETgSLlhnqLc8Rr1_HaQ2qN_JYcn7Urv_0mSJh-i8zS39F1glY3ejHHiVbl8cSJsPPw-ehpKAozf6h0_JiZBe0TuBtyTNULQH1iri19C9z_XBgBnfC1DtrnQn-UIgGbJq1TnIgtVmtTnReJqDpcf6_MGDLqCL-x192UQszb8GgWjD8tRusJ9X5HG1RHUAVyQ5gfOCegHmymyB7Dx7e5fCOghDUTT0t2dvVKbIXZGilrddKBg70iBGDA5j5-01lvnl2aaxBv51Y_zr-3IZdAyA
+        token_type: Bearer
+        expires_in: 36000
+    AccessTokenWoRefresh:
+      required:
+      - access_token
+      - expires_in
+      - token_type
+      type: object
+      properties:
+        access_token:
+          $ref: '#/components/schemas/Token'
+        token_type:
+          $ref: '#/components/schemas/BearerTokenType'
+        expires_in:
+          $ref: '#/components/schemas/PositiveInteger'
+      additionalProperties: false
+      description: Data returned when a new access token is requested
+      example:
+        access_token: eyJraWQiOiI2OWQzZDEwZi03MGRhLTQ5ODItYjI4ZC03MmU4MTQ4MzI4YTMiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pbC1kLWFwaW0uYXp1cmUtYXBpLm5ldC9taWwtaWRwIiwiYXVkIjpbImh0dHBzOi8vbWlsLWQtYXBpbS5henVyZS1hcGkubmV0L21pbC1wYXltZW50LW5vdGljZSIsImh0dHBzOi8vbWlsLWQtYXBpbS5henVyZS1hcGkubmV0L21pbC1mZWUtY2FsY3VsYXRvciJdLCJleHAiOjE2Nzg3ODkyOTUsInNjb3BlIjoidmVyaWZ5QnlRckNvZGUgYWN0aXZhdGVCeVFyQ29kZSB2ZXJpZnlCeVRheENvZGVBbmROb3RpY2VOdW1iZXIgYWN0aXZhdGVCeVRheENvZGVBbmROb3RpY2VOdW1iZXIgY2xvc2UgZ2V0UGF5bWVudFN0YXR1cyBnZXRGZWUifQ.UJ8Vwv0NwF5S3fajgsdpgV-t6VeZAVC9dR0QGVpevC6Rw35tTx_1pJq2kI0GVAp0Vm7mNmgpZgzqx14QJfBmtTz3ZMJuUYVJUfHHQxxRxEyVBslrloOCqc8LfFkC-jmVQG5_9p9f6Tb7MB-h9J_f9ivtFX9gz7jK2Q_llD3HU0FujMgHEJiloKl7sp2uDaMIiy9dOKT7m0M6sA1tA84kwuJASudd_KWotideFsiA8LMBy_fGlEO7ogF-WytXD0XfW6VIBwQKq5KB3L3HxUuOZE1Gr2hubZ9SCeGAptiaPCWeEDf4w4x3IvKUL-rmm4bs4xalCmUbWcnTkKJi5f4N_8d2aRBrCL7k01rEK-OI1NH1-cCCk97eanNxvFEAKk_9t8rggipYt9BuL929p11LHVeYqqfemz1yrzc58LJXWPNgSMZ8XjKoITzsEiKWtGMYNV6GodJs_USnMKGIlc_uynZS0Q9mUV5IWhFaOZWFkM1nNwebMq9edg-kxtj1WpNkXfP1lahOMt36a9Rn2rWBLAhMBnerigsxFmUpi90EmbDkgOKTEXd3adOWLBb0jQSw0gPlNHe4bHh_LxBNNWljd6P9yZ4CYvZsWFwt_85d-PS56y-mNWV5oFMgPd-_qeF3Fn-QMj3Q5qySoqNCLzX7pnqjzXrveazLcR-CrroIUGM
+        token_type: Bearer
+        expires_in: 36000
+    GetAccessTokenByClientCredentials:
+      required:
+      - client_id
+      - grant_type
+      type: object
+      properties:
+        grant_type:
+          $ref: '#/components/schemas/ClientCredentialsGrantType'
+        client_id:
+          $ref: '#/components/schemas/UUID'
+      additionalProperties: false
+      description: Request to get an access token by means of client credentials
+      example:
+        grant_type: client_credentials
+        client_id: d0d654e6-97da-4848-b568-99fedccb642b
+    GetAccessTokenByPassword:
+      required:
+      - client_id
+      - grant_type
+      - password
+      - username
+      type: object
+      properties:
+        grant_type:
+          $ref: '#/components/schemas/PasswordGrantType'
+        username:
+          $ref: '#/components/schemas/Username'
+        password:
+          $ref: '#/components/schemas/Password'
+        scope:
+          $ref: '#/components/schemas/OfflineAccessScope'
+        client_id:
+          $ref: '#/components/schemas/UUID'
+      additionalProperties: false
+      description: Request to get an access token by means of resource owner password
+      example:
+        grant_type: password
+        username: Merchant-001
+        password: Password-001$
+        scope: offline_access
+        client_id: d0d654e6-97da-4848-b568-99fedccb642b
+    PublicKey:
+      required:
+      - e
+      - exp
+      - iat
+      - kid
+      - kty
+      - "n"
+      - use
+      type: object
+      properties:
+        kty:
+          $ref: '#/components/schemas/KeyType'
+        e:
+          $ref: '#/components/schemas/PublicExponent'
+        use:
+          $ref: '#/components/schemas/PublicKeyUse'
+        kid:
+          $ref: '#/components/schemas/UUID'
+        exp:
+          $ref: '#/components/schemas/PositiveInteger'
+        iat:
+          $ref: '#/components/schemas/PositiveInteger'
+        "n":
+          $ref: '#/components/schemas/Modulus'
+      additionalProperties: false
+      description: Public key
+      example:
+        kty: RSA
+        e: AQAB
+        use: sig
+        kid: 0ffa8f8d-d92b-46ee-a4e7-8f26651a2a96
+        exp: 1678975089
+        iat: 1678888689
+        "n": qjcVEWJTTySeKxHsJSsmVGk2cEvXJ4tBC4uyU5MxYwBAiIWuZb_yDOIjLz7JN8QsJs3QrZtS3vqv18ljW2db6ED90OUo9CVJveSF4eNRozDHOvnHGT0HR-8Wf5GxcNy63zfQLrnfdp5F9TrhMFRMkEA0TCT7PhT3yF6YvwLtQyMciER1_KKnpGomfAkW-UpaF2nHfXiFPrOIHMuNb5BoRR1f0349tqloLgLd7vyMy1jg-BldmEgRV1bcFqjH0Cg3leROjDy9HzdFauRIlSb4VZrqNni2hgaTUHI5Xp7aCwpS9Y_mf19KpxN0_8d-f3UVRlwtI1dryelpdC5jowxia2Pf8UgSZyMs2ZxDf6eU0SH8wHEvMpeFpwmiBD1XcsISoTan0Yv7w_CLo6JOqX6EfogDQZUBzKKlVCZSoSinAz0_7Bj2orgWKQ9sbfgJWgJweKkJLH-bNSRaVcu02boxPnlJeay3wROhSAgtiKWZnsU1_FpPNG0JBFCh_x-VjkuBoREpNEyJM5NvhRCmyObtzocS4eCtAgvmo3EFv_Xa-rp0p5ez4A-_QUb5OsYOswqYbIV1GbtiAfCTOrNbv6K86LaTllZ9WqYrKgDv7KA-604K37k33LHROqcO9Q-bCN8hKzQDWs7M3DFNP6P5iBUUVs-gtWncHvIuUWTth-fBXa8
+    PublicKeys:
+      required:
+      - keys
+      type: object
+      properties:
+        keys:
+          maxItems: 32
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicKey'
+      additionalProperties: false
+      description: Public keys
+      example:
+        keys:
+        - kty: RSA
+          e: AQAB
+          use: sig
+          kid: 0ffa8f8d-d92b-46ee-a4e7-8f26651a2a96
+          exp: 1678975089
+          iat: 1678888689
+          "n": qjcVEWJTTySeKxHsJSsmVGk2cEvXJ4tBC4uyU5MxYwBAiIWuZb_yDOIjLz7JN8QsJs3QrZtS3vqv18ljW2db6ED90OUo9CVJveSF4eNRozDHOvnHGT0HR-8Wf5GxcNy63zfQLrnfdp5F9TrhMFRMkEA0TCT7PhT3yF6YvwLtQyMciER1_KKnpGomfAkW-UpaF2nHfXiFPrOIHMuNb5BoRR1f0349tqloLgLd7vyMy1jg-BldmEgRV1bcFqjH0Cg3leROjDy9HzdFauRIlSb4VZrqNni2hgaTUHI5Xp7aCwpS9Y_mf19KpxN0_8d-f3UVRlwtI1dryelpdC5jowxia2Pf8UgSZyMs2ZxDf6eU0SH8wHEvMpeFpwmiBD1XcsISoTan0Yv7w_CLo6JOqX6EfogDQZUBzKKlVCZSoSinAz0_7Bj2orgWKQ9sbfgJWgJweKkJLH-bNSRaVcu02boxPnlJeay3wROhSAgtiKWZnsU1_FpPNG0JBFCh_x-VjkuBoREpNEyJM5NvhRCmyObtzocS4eCtAgvmo3EFv_Xa-rp0p5ez4A-_QUb5OsYOswqYbIV1GbtiAfCTOrNbv6K86LaTllZ9WqYrKgDv7KA-604K37k33LHROqcO9Q-bCN8hKzQDWs7M3DFNP6P5iBUUVs-gtWncHvIuUWTth-fBXa8
+    RefreshAccessToken:
+      required:
+      - client_id
+      - grant_type
+      - refresh_token
+      type: object
+      properties:
+        grant_type:
+          $ref: '#/components/schemas/RefreshGrantType'
+        client_id:
+          $ref: '#/components/schemas/UUID'
+        refresh_token:
+          $ref: '#/components/schemas/Token'
+      additionalProperties: false
+      description: Request to get an access token by means of a refresh token
+      example:
+        grant_type: refresh_token
+        client_id: d0d654e6-97da-4848-b568-99fedccb642b
+        refresh_token: eyJraWQiOiIxN2YwNWViZC1hMWMzLTRjNWMtODM4Ny1jOWZlNjU4MDRiMDEiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pbC1kLWFwaW0uYXp1cmUtYXBpLm5ldC9taWwtaWRwIiwiYXVkIjoiaHR0cHM6Ly9taWwtZC1hcGltLmF6dXJlLWFwaS5uZXQvbWlsLWlkcCIsImV4cCI6MTY3ODg4MTA1NSwic2NvcGUiOiJvZmZsaW5lX2FjY2VzcyJ9.Bu-BXKRMoE8fdBfuoPAa70WQYUWVH3BK3VFMw-9mr7hGlKBSONXQY8vcrFuh4OLm6vHX2hUagYuJ3yS_Anm5AHU8Kpay0dGm30fyPxFAyv5s_Yn_ET3VExPZBedBSlHl0Rzt0JQ_9X07X0JkCwWacxWMueKNoVndAh3QxswbkwtEANAKvQcvAtdLjh-93eDYFq0vvS8qNRReTZf46fldIL9H5-0MMqjfVi5A6y8YCzx7_kOHKq8wCy7u75QtKhPRzYnY0JcBVMALZgQovpCYpnlPkP3JV3cgdmlDGWmGHbKQz9iQ5bY1071e3vhxqR2iEqFJwn7nohYq9sxkMQGxNxz2BI-w3v_SQ3zS3mI1qK_qm1c7yzyF3c_lB920T5hBup9RozIXVb2OkX38pW6JKORETgSLlhnqLc8Rr1_HaQ2qN_JYcn7Urv_0mSJh-i8zS39F1glY3ejHHiVbl8cSJsPPw-ehpKAozf6h0_JiZBe0TuBtyTNULQH1iri19C9z_XBgBnfC1DtrnQn-UIgGbJq1TnIgtVmtTnReJqDpcf6_MGDLqCL-x192UQszb8GgWjD8tRusJ9X5HG1RHUAVyQ5gfOCegHmymyB7Dx7e5fCOghDUTT0t2dvVKbIXZGilrddKBg70iBGDA5j5-01lvnl2aaxBv51Y_zr-3IZdAyA
+    UUID:
+      pattern: "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+      type: string
+      description: UUID
+      format: uuid
+      example: d0d654e6-97da-4848-b568-99fedccb642b
+    Errors:
+      required:
+      - errors
+      type: object
+      properties:
+        errors:
+          maxItems: 32
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+      additionalProperties: false
+      description: List of errors
+      example:
+        errors:
+        - 00000000A
+        - "001000001"
+    Error:
+      pattern: "^[A-F0-9]{9}$"
+      type: string
+      description: Error code
+      example: "001000005"
+    PositiveInteger:
+      minimum: 1
+      type: integer
+      description: Non negative integer
+      example: 234
+  responses:
+    AccessToken:
+      description: Response provided when an access token is requested
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccessToken'
+    AccessTokenWoRefresh:
+      description: Response provided when an access token is requested
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccessTokenWoRefresh'
+    Jwks:
+      description: Public keys
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PublicKeys'
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+  parameters:
+    RequestId:
+      name: RequestId
+      in: header
+      description: Request Id that will be logged by services
+      required: true
+      schema:
+        $ref: '#/components/schemas/UUID'
+    Version:
+      name: Version
+      in: header
+      description: Version of the required API
+      required: false
+      schema:
+        maxLength: 64
+        pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\\
+          d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\
+          +([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+        type: string
+        example: 1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
+    AcquirerId:
+      name: AcquirerId
+      in: header
+      description: Acquirer ID assigned by PagoPA
+      required: true
+      schema:
+        pattern: "^\\d{1,11}$"
+        type: string
+        example: "4585625"
+    Channel:
+      name: Channel
+      in: header
+      description: Channel originating the request
+      required: true
+      schema:
+        type: string
+        example: ATM
+        enum:
+        - ATM
+        - POS
+        - TOTEM
+        - CASH_REGISTER
+        - CSA
+    MerchantId:
+      name: MerchantId
+      in: header
+      description: Merchant ID. Mandatory when Channel equals POS.
+      required: false
+      schema:
+        pattern: "^[0-9a-zA-Z]{1,15}$"
+        type: string
+        example: 28405fHfk73x88D
+    TerminalId:
+      name: TerminalId
+      in: header
+      description: ID of the terminal originating the transaction. It must be unique
+        per acquirer and channel.
+      required: true
+      schema:
+        pattern: "^[0-9a-zA-Z]{1,8}$"
+        type: string
+        example: 0aB9wXyZ
+  requestBodies:
+    GetAccessTokenByPassword:
+      description: Request to get an access token by means of username and password
+        or by refresh token
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/GetAccessTokenByPassword'
+            - $ref: '#/components/schemas/RefreshAccessToken'
+    GetAccessTokenByApiKey:
+      description: Request to get an access token by means of client credentials
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            $ref: '#/components/schemas/GetAccessTokenByClientCredentials'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: This API uses API key when it is invoked by a server application
+      name: Ocp-Apim-Subscription-Key
+      in: header
