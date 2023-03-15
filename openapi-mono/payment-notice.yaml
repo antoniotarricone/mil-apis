@@ -6,7 +6,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 8.0.0
+  version: 9.0.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-payment-notice
   description: DEV
@@ -77,12 +77,13 @@ paths:
           example: 0aB9wXyZ
       - name: qrCode
         in: path
-        description: String encoded by the QR-code
+        description: Base64Url of the string encoded by the QR-code. This is due to
+          a bug of Azure routing system which decodes %2F before routing the request.
         required: true
         style: simple
         explode: false
         schema:
-          $ref: '#/components/schemas/QrCode'
+          $ref: '#/components/schemas/QrCodeBase64UrlEnc'
       responses:
         "200":
           description: Verify processed
@@ -179,12 +180,13 @@ paths:
           example: 0aB9wXyZ
       - name: qrCode
         in: path
-        description: String encoded by the QR-code
+        description: Base64Url of the string encoded by the QR-code. This is due to
+          a bug of Azure routing system which decodes %2F before routing the request.
         required: true
         style: simple
         explode: false
         schema:
-          $ref: '#/components/schemas/QrCode'
+          $ref: '#/components/schemas/QrCodeBase64UrlEnc'
       requestBody:
         $ref: '#/components/requestBodies/Activate'
       responses:
@@ -224,7 +226,7 @@ paths:
       - ApiKeyAuth: []
       - oAuthPassword:
         - activateByQrCode
-  /paymentNoticesDec/{paTaxCode}/{noticeNumber}:
+  /paymentNotices/{paTaxCode}/{noticeNumber}:
     get:
       summary: Verify a payment notice by PA tax code and notice number
       operationId: verifyByTaxCodeAndNoticeNumber
@@ -762,6 +764,12 @@ components:
       type: string
       description: String encoded by the QR-code
       example: PAGOPA|002|000000000000000000|00000000000|9999
+    QrCodeBase64UrlEnc:
+      pattern: "^[a-zA-Z0-9_-]{62}$"
+      type: string
+      description: Base64Url of the string encoded by the QR-code. This is due to
+        a bug of Azure routing system which decodes %2F before routing the request.
+      example: UEFHT1BBfDAwMnwwMDAwMDAwMDAwMDAwMDAwMDB8MDAwMDAwMDAwMDB8OTk5OQ
     PaymentStatus:
       required:
       - outcome

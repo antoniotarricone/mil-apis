@@ -1,0 +1,227 @@
+openapi: 3.0.3
+
+info:
+  title: Identity Provider Microservice
+  version: 1.0.0
+  description: Identity Provider Microservice for Multi-channel Integration Layer of SW Client Project
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+  - description: DEV
+    url: https://mil-d-apim.azure-api.net/mil-idp
+  - description: DEV-EXT-SUB
+    url: https://mil-d-apim.azure-api.net/ext/sub/mil-payment-notice
+
+paths:
+  /token:
+    post:
+      operationId: getAccessToken
+      summary: Get access token by means of resource owner password or refresh token
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/MerchantId'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+      requestBody:
+        $ref: '#/components/requestBodies/GetAccessToken'
+      responses:
+        "201":
+          $ref: '#/components/responses/AccessToken'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: API key is missing or invalid
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "415":
+          description: Unsupported media type. Did you provide application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+components:
+  # ========================================================
+  # Schemas
+  # ========================================================
+  schemas:
+    # ------------------------------------------------------
+    # Basic types
+    # ------------------------------------------------------
+    BearedTokenType:
+      description: Token type for bearer token
+      enun:
+        - Bearer
+      type: string
+      example: "Bearer"
+    
+    OfflineAccessScope:
+      description: Scope for offline_access
+      enun:
+        - offline_access
+      type: string
+      example: "offline_access"
+    
+    Password:
+      description: User password
+      type: string
+      pattern: "^[ -~]{1,64}$"
+      example: "Password-001$"
+      
+    PasswordGrantType:
+      description: Grant type to get an access token with resource owner password
+      enum:
+        - password
+      type: string
+      example: "password"
+
+    RefreshGrantType:
+      description: Grant type to refresh an access token
+      enum:
+        - refresh_token
+      type: string
+      example: "refresh_token"
+
+    Token:
+      description: Token
+      type: string
+      pattern: "^[a-zA-Z0-9_-]{1,1024}\\.[a-zA-Z0-9_-]{1,1024}\\.[a-zA-Z0-9_-]{1,1024}$"
+      example: "eyJraWQiOiI2OWQzZDEwZi03MGRhLTQ5ODItYjI4ZC03MmU4MTQ4MzI4YTMiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pbC1kLWFwaW0uYXp1cmUtYXBpLm5ldC9taWwtaWRwIiwiYXVkIjpbImh0dHBzOi8vbWlsLWQtYXBpbS5henVyZS1hcGkubmV0L21pbC1wYXltZW50LW5vdGljZSIsImh0dHBzOi8vbWlsLWQtYXBpbS5henVyZS1hcGkubmV0L21pbC1mZWUtY2FsY3VsYXRvciJdLCJleHAiOjE2Nzg3ODkyOTUsInNjb3BlIjoidmVyaWZ5QnlRckNvZGUgYWN0aXZhdGVCeVFyQ29kZSB2ZXJpZnlCeVRheENvZGVBbmROb3RpY2VOdW1iZXIgYWN0aXZhdGVCeVRheENvZGVBbmROb3RpY2VOdW1iZXIgY2xvc2UgZ2V0UGF5bWVudFN0YXR1cyBnZXRGZWUifQ.UJ8Vwv0NwF5S3fajgsdpgV-t6VeZAVC9dR0QGVpevC6Rw35tTx_1pJq2kI0GVAp0Vm7mNmgpZgzqx14QJfBmtTz3ZMJuUYVJUfHHQxxRxEyVBslrloOCqc8LfFkC-jmVQG5_9p9f6Tb7MB-h9J_f9ivtFX9gz7jK2Q_llD3HU0FujMgHEJiloKl7sp2uDaMIiy9dOKT7m0M6sA1tA84kwuJASudd_KWotideFsiA8LMBy_fGlEO7ogF-WytXD0XfW6VIBwQKq5KB3L3HxUuOZE1Gr2hubZ9SCeGAptiaPCWeEDf4w4x3IvKUL-rmm4bs4xalCmUbWcnTkKJi5f4N_8d2aRBrCL7k01rEK-OI1NH1-cCCk97eanNxvFEAKk_9t8rggipYt9BuL929p11LHVeYqqfemz1yrzc58LJXWPNgSMZ8XjKoITzsEiKWtGMYNV6GodJs_USnMKGIlc_uynZS0Q9mUV5IWhFaOZWFkM1nNwebMq9edg-kxtj1WpNkXfP1lahOMt36a9Rn2rWBLAhMBnerigsxFmUpi90EmbDkgOKTEXd3adOWLBb0jQSw0gPlNHe4bHh_LxBNNWljd6P9yZ4CYvZsWFwt_85d-PS56y-mNWV5oFMgPd-_qeF3Fn-QMj3Q5qySoqNCLzX7pnqjzXrveazLcR-CrroIUGM"
+
+    Username:
+      description: User name
+      type: string
+      pattern: "^[ -~]{1,64}$"
+      example: "Merchant-001"
+      
+    # ------------------------------------------------------
+    # Complex types
+    # ------------------------------------------------------
+    AccessToken:
+      description: Data returned when a new access token is requested
+      type: object
+      additionalProperties: false
+      properties:
+        access_token:
+          $ref: '#/components/schema/Token'
+        refresh_token:
+          $ref: '#/components/schema/Token'
+        token_type:
+          $ref: '#/components/schema/BearerTokenType'
+        expires_in:
+          $ref: 'common.yaml#/components/schemas/PositiveInteger'
+      required:
+        - access_token
+        - token_type
+        - expires_in
+      example:
+        access_token:
+        refresh_token:
+        token_type: "Bearer"
+        expires_in: 36000
+        
+    GetAccessTokenByPassword:
+      description: Request to get an access token by means of resource owner password
+      type: object
+      additionalProperties: false
+      properties:
+        grant_type:
+          $ref: '#/components/schemas/PasswordGrantType'
+        username:
+          $ref: '#/components/schemas/Username'
+        password:
+          $ref: '#/components/schemas/Password'
+        scope:
+          $ref: '#/components/schemas/OfflineAccessScope'
+        client_id:
+          $ref: 'common.yaml#/components/schemas/UUID'
+      required:
+        - grant_type
+        - username
+        - password
+        - client_id
+      example:
+        grant_type: "password"
+        username: "Merchant-001"
+        password: "Password-001$"
+        scope: "offline_access"
+        client: "d0d654e6-97da-4848-b568-99fedccb642b"
+  
+    RefreshAccessToken:
+      description: Request to get an access token by means of a refresh token
+      type: object
+      additionalProperties: false
+      properties:
+        grant_type:
+          $ref: '#/components/schemas/RefreshGrantType'
+        client_id:
+          $ref: 'common.yaml#/components/schemas/UUID'
+        refresh_token:
+          $ref: '#components/schemas/Token'
+      required:
+        - grant_type
+        - client_id
+        - refresh_token
+      example:
+        grant_type: "refresh_token"
+        client: "d0d654e6-97da-4848-b568-99fedccb642b"
+        refresh_token: ""
+    
+  # ========================================================
+  # Request bodies
+  # ========================================================
+  requestBodies:
+    # ------------------------------------------------------
+    # For getAccessToken
+    # ------------------------------------------------------
+    GetAccessToken:
+      description: Request an access token by means of username and password or by refresh token
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/GetAccessTokenByPassword'
+              - $ref: '#/components/schemas/RefreshAccessToken'
+
+  # ========================================================
+  # Responses
+  # ========================================================
+  responses:
+    # ------------------------------------------------------
+    # For getAccessToken
+    # ------------------------------------------------------
+    AccessToken:
+      description: Response provided when an access token is requested
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccessToken'
+
+  # ========================================================
+  # Security schemes
+  # ========================================================
+  securitySchemes:
+    ApiKeyAuth:
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
+       
+    oAuthPassword:
+      type: oauth2
+      description: This API uses OAuth 2 with Resource Owner Password Credentials when it is invoked by a trusted client
+      flows:
+        password:
+          tokenUrl: ../oauth2/token
+          scopes:
+            verifyByQrCode: Verify a payment notice by QR-code
+            activateByQrCode: Activate the payment of a notice by QR-code
+            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code and notice number
+            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by PA tax code and notice number
+            close: Close the payment of a set of notices
+            getPaymentStatus: Retrieve the status of the payment of a set of payment notices
