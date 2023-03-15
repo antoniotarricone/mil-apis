@@ -5,14 +5,10 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 2.2.0
+  version: 3.0.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-fee-calculator
   description: DEV
-- url: https://mil-d-apim.azure-api.net/ext/sub/mil-fee-calculator
-  description: DEV-EXT-SUB
-- url: https://mil-d-apim.azure-api.net/ext/aut/mil-fee-calculator
-  description: DEV-EXT-AUT
 paths:
   /fees:
     post:
@@ -90,7 +86,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Errors'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "404":
@@ -110,8 +106,7 @@ paths:
         default:
           description: Unexpected error
       security:
-      - ApiKeyAuth: []
-      - oAuthPassword:
+      - oAuth2:
         - getFee
 components:
   schemas:
@@ -323,17 +318,47 @@ components:
                 - paTaxCode: "15376371009"
                   category: KTM
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      description: This API uses API key when it is invoked by a server application
-      name: Ocp-Apim-Subscription-Key
-      in: header
-    oAuthPassword:
+    oAuth2:
       type: oauth2
-      description: This API uses OAuth 2 with Resource Owner Password Credentials
-        when it is invoked by a trusted client
+      description: This API uses OAuth2
       flows:
         password:
-          tokenUrl: ../oauth2/token
+          tokenUrl: ../mil-idp/pwd/token
           scopes:
+            verifyByQrCode: Verify a payment notice by QR-code
+            activateByQrCode: Activate the payment of a notice by QR-code
+            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code
+              and notice number
+            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
+              PA tax code and notice number
+            close: Close the payment of a set of notices
+            getPaymentStatus: Retrieve the status of the payment of a set of payment
+              notices
             getFee: Calculate the fee amount for a set of payment notices
+            getServices: Return the list of services available for end-users
+            deleteSessionById: Delete a session by ID
+            createSession: Create a session
+            checkPairingStatus: Retrieve the pairing status with IO
+            accept: Store the acceptance of T&C for the user identified by the tax
+              code stored in the session
+            presaveExplicit: Pre-save the payment card in the internal Wallet
+        clientCredentials:
+          tokenUrl: ../mil-ipd/clt/token
+          scopes:
+            verifyByQrCode: Verify a payment notice by QR-code
+            activateByQrCode: Activate the payment of a notice by QR-code
+            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code
+              and notice number
+            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
+              PA tax code and notice number
+            close: Close the payment of a set of notices
+            getPaymentStatus: Retrieve the status of the payment of a set of payment
+              notices
+            getFee: Calculate the fee amount for a set of payment notices
+            getServices: Return the list of services available for end-users
+            deleteSessionById: Delete a session by ID
+            createSession: Create a session
+            checkPairingStatus: Retrieve the pairing status with IO
+            accept: Store the acceptance of T&C for the user identified by the tax
+              code stored in the session
+            presaveExplicit: Pre-save the payment card in the internal Wallet

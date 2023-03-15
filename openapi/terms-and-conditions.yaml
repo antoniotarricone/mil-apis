@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Terms and Condition Microservice
-  version: 2.1.0
+  version: 3.0.0
   description: Terms and Condition Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -12,14 +12,13 @@ servers:
   - description: DEV
     url: https://mil-d-apim.azure-api.net/mil-termsandconds
 
-security:
-  - ApiKeyAuth: []
-
 paths:
   /acceptedTermsConds:
     post:
       operationId: accept
       summary: Store the acceptance of T&C for the user identified by the tax code stored in the session
+      security:
+        - oAuth2: [ accept ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -34,7 +33,7 @@ paths:
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "406":
@@ -50,7 +49,10 @@ paths:
   /acceptedTermsConds/{taxCode}:
     get:
       operationId: check
+      tags: [ internal ]
       summary: Check the acceptance of T&C for the user identified by the tax code
+      security:
+        - ApiKeyAuth: []
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -126,3 +128,6 @@ components:
   securitySchemes:
     ApiKeyAuth:
       $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
+    
+    oAuth2:
+      $ref: 'common.yaml#/components/securitySchemes/oAuth2'

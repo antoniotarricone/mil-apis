@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Fee Calculator Microservice
-  version: 2.2.0
+  version: 3.0.0
   description: Fee Calculator for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -11,10 +11,6 @@ info:
 servers:
   - description: DEV
     url: https://mil-d-apim.azure-api.net/mil-fee-calculator
-  - description: DEV-EXT-SUB
-    url: https://mil-d-apim.azure-api.net/ext/sub/mil-fee-calculator
-  - description: DEV-EXT-AUT
-    url: https://mil-d-apim.azure-api.net/ext/aut/mil-fee-calculator
 
 paths:
   /fees:
@@ -25,9 +21,7 @@ paths:
       operationId: getFee
       summary: Calculate the fee amount for a set of payment notices
       security: 
-        - ApiKeyAuth: []
-        - oAuthPassword: 
-          - getFee
+        - oAuth2: [ getFee ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -43,7 +37,7 @@ paths:
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "404":
@@ -144,14 +138,5 @@ components:
   # Security schemes
   # ========================================================
   securitySchemes:
-    ApiKeyAuth:
-      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
-
-    oAuthPassword:
-      type: oauth2
-      description: This API uses OAuth 2 with Resource Owner Password Credentials when it is invoked by a trusted client
-      flows:
-        password:
-          tokenUrl: ../oauth2/token
-          scopes:
-            getFee: Calculate the fee amount for a set of payment notices
+    oAuth2:
+      $ref: 'common.yaml#/components/securitySchemes/oAuth2'

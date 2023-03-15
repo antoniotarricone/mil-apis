@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Services Microservice
-  version: 2.1.0
+  version: 3.0.0
   description: Handling of end-user services for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -12,14 +12,13 @@ servers:
   - description: DEV
     url: https://mil-d-apim.azure-api.net/mil-functions
 
-security:
-  - ApiKeyAuth: [ ]
-
 paths:
   /services:
     get:
       operationId: getServices
       summary: Return the list of services available for end-users
+      security: 
+        - oAuth2: [ getServices ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -33,7 +32,7 @@ paths:
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "404":
@@ -106,5 +105,5 @@ components:
               - services
 
   securitySchemes:
-    ApiKeyAuth:
-      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
+    oAuth2:
+      $ref: 'common.yaml#/components/securitySchemes/oAuth2'

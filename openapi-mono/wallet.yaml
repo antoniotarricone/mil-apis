@@ -6,12 +6,10 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 3.1.0
+  version: 4.0.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-wallet
   description: DEV
-security:
-- ApiKeyAuth: []
 paths:
   /cards:
     post:
@@ -94,7 +92,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Errors'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "406":
@@ -111,6 +109,9 @@ paths:
                 $ref: '#/components/schemas/Errors'
         default:
           description: Unexpected error
+      security:
+      - oAuth2:
+        - presaveExplicit
 components:
   schemas:
     UUID:
@@ -232,8 +233,47 @@ components:
       schema:
         $ref: '#/components/schemas/UUID'
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      description: This API uses API key when it is invoked by a server application
-      name: Ocp-Apim-Subscription-Key
-      in: header
+    oAuth2:
+      type: oauth2
+      description: This API uses OAuth2
+      flows:
+        password:
+          tokenUrl: ../mil-idp/pwd/token
+          scopes:
+            verifyByQrCode: Verify a payment notice by QR-code
+            activateByQrCode: Activate the payment of a notice by QR-code
+            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code
+              and notice number
+            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
+              PA tax code and notice number
+            close: Close the payment of a set of notices
+            getPaymentStatus: Retrieve the status of the payment of a set of payment
+              notices
+            getFee: Calculate the fee amount for a set of payment notices
+            getServices: Return the list of services available for end-users
+            deleteSessionById: Delete a session by ID
+            createSession: Create a session
+            checkPairingStatus: Retrieve the pairing status with IO
+            accept: Store the acceptance of T&C for the user identified by the tax
+              code stored in the session
+            presaveExplicit: Pre-save the payment card in the internal Wallet
+        clientCredentials:
+          tokenUrl: ../mil-ipd/clt/token
+          scopes:
+            verifyByQrCode: Verify a payment notice by QR-code
+            activateByQrCode: Activate the payment of a notice by QR-code
+            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code
+              and notice number
+            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
+              PA tax code and notice number
+            close: Close the payment of a set of notices
+            getPaymentStatus: Retrieve the status of the payment of a set of payment
+              notices
+            getFee: Calculate the fee amount for a set of payment notices
+            getServices: Return the list of services available for end-users
+            deleteSessionById: Delete a session by ID
+            createSession: Create a session
+            checkPairingStatus: Retrieve the pairing status with IO
+            accept: Store the acceptance of T&C for the user identified by the tax
+              code stored in the session
+            presaveExplicit: Pre-save the payment card in the internal Wallet

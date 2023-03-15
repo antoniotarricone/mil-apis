@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Wallet Microservice
-  version: 3.1.0
+  version: 4.0.0
   description: Wallet Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -12,14 +12,13 @@ servers:
   - description: DEV
     url: https://mil-d-apim.azure-api.net/mil-wallet
 
-security:
-  - ApiKeyAuth: [ ]
-
 paths:
   /cards:
     post:
       operationId: presaveExplicit
       summary: Pre-save the payment card in the internal Wallet
+      security:
+        - oAuth2: [ presaveExplicit ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -47,7 +46,7 @@ paths:
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "406":
@@ -63,5 +62,5 @@ paths:
 
 components:
   securitySchemes:
-    ApiKeyAuth:
-      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
+    oAuth2:
+      $ref: 'common.yaml#/components/securitySchemes/oAuth2'

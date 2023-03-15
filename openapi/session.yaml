@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Session Microservice
-  version: 4.1.0
+  version: 5.0.0
   description: Session Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -11,9 +11,6 @@ info:
 servers:
   - description: DEV
     url: https://mil-d-apim.azure-api.net/mil-session
-
-security:
-  - ApiKeyAuth: [ ]
 
 paths:
   /sessions/{id}:
@@ -36,7 +33,10 @@ paths:
     # ------------------------------------------------------
     get:
       operationId: getSessionById
+      tags: [ internal ]
       summary: Read a session by ID
+      security:
+        - ApiKeyAuth: [ ]
       responses:
         "200":
           $ref: '#/components/responses/SessionRetrieved'
@@ -63,13 +63,15 @@ paths:
     delete:
       operationId: deleteSessionById
       summary: Delete a session by ID
+      security:
+        - oAuth2: [ deleteSessionById ]
       responses:
         "204":
           description: Session deleted
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "404":
@@ -88,7 +90,10 @@ paths:
     # ------------------------------------------------------
     patch:
       operationId: updateSessionById
+      tags: [ internal ]
       summary: Update partially a session by ID
+      security:
+        - ApiKeyAuth: [ ]
       requestBody:
         $ref: '#/components/requestBodies/UpdateSession'
       responses:
@@ -128,6 +133,8 @@ paths:
     post:
       operationId: createSession
       summary: Create a session
+      security:
+        - oAuth2: [ createSession ]
       requestBody:
         $ref: '#/components/requestBodies/CreateSession'
       responses:
@@ -138,7 +145,7 @@ paths:
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "406":
@@ -158,6 +165,8 @@ paths:
     get:
       operationId: checkPairingStatus
       summary: Retrieve the pairing status with IO
+      security:
+        - oAuth2: [ checkPairingStatus ]
       parameters:
         - name: pairingToken
           in: query
@@ -171,7 +180,7 @@ paths:
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
-          description: API key is missing or invalid
+          description: Access token is missing or invalid
         "403":
           description: Forbidden
         "404":
@@ -191,7 +200,10 @@ paths:
     # ------------------------------------------------------
     post:
       operationId: pair
+      tags: [ internal ]
       summary: Pair the session with IO
+      security:
+        - ApiKeyAuth: [ ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
       requestBody:
@@ -524,3 +536,6 @@ components:
   securitySchemes:
     ApiKeyAuth:
       $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
+    
+    oAuth2:
+      $ref: 'common.yaml#/components/securitySchemes/oAuth2'
