@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Identity Provider Microservice
-  version: 1.0.0
+  version: 1.1.0
   description: Identity Provider Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -111,6 +111,13 @@ components:
     # ------------------------------------------------------
     # Basic types
     # ------------------------------------------------------
+    AdditionalData:
+      description: Additional data for external token authentication
+      type: string
+      pattern: "^[ -~]{1,4096}$"
+      example: "4b7eb94b-10c9-4f11-a10e-7292b29ab115"
+    
+    
     BearerTokenType:
       description: Token type for bearer token
       type: string
@@ -124,6 +131,19 @@ components:
         - client_credentials
       type: string
       example: "client_credentials"
+      
+    ExternalToken:
+      description: External token
+      type: string
+      pattern: "^[ -~]{1,4096}$"
+      example: "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJOZXhpIiwicG95bnQuZGlkIjoidXJuOnRpZDo1NTYyYjhlZC1lODljLTMzMmEtYThkYy1jYTA4MTcxMzUxMTAiLCJwb3ludC5kc3QiOiJEIiwicG95bnQub3JnIjoiMGU2Zjc4ODYtMDk1Ni00NDA1LWJjNDgtYzE5ODY4ZDdlZTIyIiwicG95bnQuc2N0IjoiVSIsImlzcyI6Imh0dHBzOlwvXC9zZXJ2aWNlcy1ldS5wb3ludC5uZXQiLCJwb3ludC51cmUiOiJPIiwicG95bnQua2lkIjozOTMyNDI1MjY4MDY5NDA5MjM0LCJwb3ludC5zY3YiOiJOZXhpIiwicG95bnQuc3RyIjoiZDNmZDNmZDMtMTg5ZC00N2M4LThjMzYtYjY4NWRkNjBkOTY0IiwiYXVkIjoidXJuOnRpZDo1NTYyYjhlZC1lODljLTMzMmEtYThkYy1jYTA4MTcxMzUxMTAiLCJwb3ludC51aWQiOjM3MzY1NzQsInBveW50LmJpeiI6IjRiN2ViOTRiLTEwYzktNGYxMS1hMTBlLTcyOTJiMjlhYjExNSIsImV4cCI6MTY4MDc4MzUzNiwiaWF0IjoxNjgwNjk3MTM2LCJqdGkiOiI3MjBmMDFlZS1iZDk4LTRjYjItOTU2Mi0xZjI4YWY2NGJhZGYifQ.dTuvtzqy9oPWIN4NIBdhIR09Xpm70dgRCP-ybuVLo24DwqaysPKNmEHDXcq2gGE1w2L6e783_PXRK3RI0j1TQRFeLRbiPzN5imBdrJ2LlV8QNdkElOl2x32j652YeFcoAitBzFss_Do0_rquU_008eeIXWa-B-AiMsdAqgLUiMigsTT42rQYr7Mb8Am_NWwvZ9-DWiox6HbuUNUo3TStBmLervqlQ5j2_3AzcOILp8cJX0699fw7Y6gcu_pNHgjswqD0UVPSAmHf_bqFAH6b98qHVKe3isMSoktYi4FfWdpG1ykviEp9Ii0QKfeLnqyIR6g2o2XzGlDv7Usv5ouiXg"
+    
+    ExternalTokenGrantType:
+      description: Grant type to get an access token by means of external token
+      enum:
+        - poynt_token
+      type: string
+      example: "poynt_token"
     
     KeyType:
       description: Key type
@@ -257,10 +277,37 @@ components:
         client_id: "d0d654e6-97da-4848-b568-99fedccb642b"
         #client_secret: "265a5ac0-c651-428e-bed6-763f6cd244b5"
     
+    GetAccessTokenByExternalToken:
+      description: Request to get an access token by means of external token
+      type: object
+      additionalProperties: true
+      properties:
+        grant_type:
+          $ref: '#/components/schemas/ExternalTokenGrantType'
+        ext_token:
+          $ref: '#/components/schemas/ExternalToken'
+        add_data:
+          $ref: '#/components/schemas/AdditionalData'
+        scope:
+          $ref: '#/components/schemas/OfflineAccessScope'
+        client_id:
+          $ref: 'common.yaml#/components/schemas/UUID'
+      required:
+        - grant_type
+        - ext_token
+        - add_data
+        - client_id
+      example:
+        grant_type: "poynt_token"
+        ext_token: "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJOZXhpIiwicG95bnQuZGlkIjoidXJuOnRpZDo1NTYyYjhlZC1lODljLTMzMmEtYThkYy1jYTA4MTcxMzUxMTAiLCJwb3ludC5kc3QiOiJEIiwicG95bnQub3JnIjoiMGU2Zjc4ODYtMDk1Ni00NDA1LWJjNDgtYzE5ODY4ZDdlZTIyIiwicG95bnQuc2N0IjoiVSIsImlzcyI6Imh0dHBzOlwvXC9zZXJ2aWNlcy1ldS5wb3ludC5uZXQiLCJwb3ludC51cmUiOiJPIiwicG95bnQua2lkIjozOTMyNDI1MjY4MDY5NDA5MjM0LCJwb3ludC5zY3YiOiJOZXhpIiwicG95bnQuc3RyIjoiZDNmZDNmZDMtMTg5ZC00N2M4LThjMzYtYjY4NWRkNjBkOTY0IiwiYXVkIjoidXJuOnRpZDo1NTYyYjhlZC1lODljLTMzMmEtYThkYy1jYTA4MTcxMzUxMTAiLCJwb3ludC51aWQiOjM3MzY1NzQsInBveW50LmJpeiI6IjRiN2ViOTRiLTEwYzktNGYxMS1hMTBlLTcyOTJiMjlhYjExNSIsImV4cCI6MTY4MDc4MzUzNiwiaWF0IjoxNjgwNjk3MTM2LCJqdGkiOiI3MjBmMDFlZS1iZDk4LTRjYjItOTU2Mi0xZjI4YWY2NGJhZGYifQ.dTuvtzqy9oPWIN4NIBdhIR09Xpm70dgRCP-ybuVLo24DwqaysPKNmEHDXcq2gGE1w2L6e783_PXRK3RI0j1TQRFeLRbiPzN5imBdrJ2LlV8QNdkElOl2x32j652YeFcoAitBzFss_Do0_rquU_008eeIXWa-B-AiMsdAqgLUiMigsTT42rQYr7Mb8Am_NWwvZ9-DWiox6HbuUNUo3TStBmLervqlQ5j2_3AzcOILp8cJX0699fw7Y6gcu_pNHgjswqD0UVPSAmHf_bqFAH6b98qHVKe3isMSoktYi4FfWdpG1ykviEp9Ii0QKfeLnqyIR6g2o2XzGlDv7Usv5ouiXg"
+        add_data: "4b7eb94b-10c9-4f11-a10e-7292b29ab115"
+        scope: "offline_access"
+        client_id: "d0d654e6-97da-4848-b568-99fedccb642b"
+    
     GetAccessTokenByPassword:
       description: Request to get an access token by means of resource owner password
       type: object
-      additionalProperties: false
+      additionalProperties: true
       properties:
         grant_type:
           $ref: '#/components/schemas/PasswordGrantType'
@@ -345,7 +392,7 @@ components:
     RefreshAccessToken:
       description: Request to get an access token by means of a refresh token
       type: object
-      additionalProperties: false
+      additionalProperties: true
       properties:
         grant_type:
           $ref: '#/components/schemas/RefreshGrantType'
@@ -361,7 +408,7 @@ components:
         grant_type: "refresh_token"
         client_id: "d0d654e6-97da-4848-b568-99fedccb642b"
         refresh_token: "eyJraWQiOiIxN2YwNWViZC1hMWMzLTRjNWMtODM4Ny1jOWZlNjU4MDRiMDEiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL21pbC1kLWFwaW0uYXp1cmUtYXBpLm5ldC9taWwtaWRwIiwiYXVkIjoiaHR0cHM6Ly9taWwtZC1hcGltLmF6dXJlLWFwaS5uZXQvbWlsLWlkcCIsImV4cCI6MTY3ODg4MTA1NSwic2NvcGUiOiJvZmZsaW5lX2FjY2VzcyJ9.Bu-BXKRMoE8fdBfuoPAa70WQYUWVH3BK3VFMw-9mr7hGlKBSONXQY8vcrFuh4OLm6vHX2hUagYuJ3yS_Anm5AHU8Kpay0dGm30fyPxFAyv5s_Yn_ET3VExPZBedBSlHl0Rzt0JQ_9X07X0JkCwWacxWMueKNoVndAh3QxswbkwtEANAKvQcvAtdLjh-93eDYFq0vvS8qNRReTZf46fldIL9H5-0MMqjfVi5A6y8YCzx7_kOHKq8wCy7u75QtKhPRzYnY0JcBVMALZgQovpCYpnlPkP3JV3cgdmlDGWmGHbKQz9iQ5bY1071e3vhxqR2iEqFJwn7nohYq9sxkMQGxNxz2BI-w3v_SQ3zS3mI1qK_qm1c7yzyF3c_lB920T5hBup9RozIXVb2OkX38pW6JKORETgSLlhnqLc8Rr1_HaQ2qN_JYcn7Urv_0mSJh-i8zS39F1glY3ejHHiVbl8cSJsPPw-ehpKAozf6h0_JiZBe0TuBtyTNULQH1iri19C9z_XBgBnfC1DtrnQn-UIgGbJq1TnIgtVmtTnReJqDpcf6_MGDLqCL-x192UQszb8GgWjD8tRusJ9X5HG1RHUAVyQ5gfOCegHmymyB7Dx7e5fCOghDUTT0t2dvVKbIXZGilrddKBg70iBGDA5j5-01lvnl2aaxBv51Y_zr-3IZdAyA"
-    
+
   # ========================================================
   # Request bodies
   # ========================================================
@@ -370,13 +417,14 @@ components:
     # For getAccessTokenByPassword
     # ------------------------------------------------------
     GetAccessTokenByPassword:
-      description: Request to get an access token by means of username and password or by refresh token
+      description: Request to get an access token by means of username and password or by refresh token or by external token
       content:
         application/x-www-form-urlencoded:
           schema:
             oneOf:
               - $ref: '#/components/schemas/GetAccessTokenByPassword'
               - $ref: '#/components/schemas/RefreshAccessToken'
+              - $ref: '#/components/schemas/GetAccessTokenByExternalToken'
     
     # ------------------------------------------------------
     # For getAccessTokenByApiKey

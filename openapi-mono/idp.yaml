@@ -6,7 +6,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 1.0.0
+  version: 1.1.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-idp
   description: DEV
@@ -232,6 +232,11 @@ paths:
       security: []
 components:
   schemas:
+    AdditionalData:
+      pattern: "^[ -~]{1,4096}$"
+      type: string
+      description: Additional data for external token authentication
+      example: 4b7eb94b-10c9-4f11-a10e-7292b29ab115
     BearerTokenType:
       type: string
       description: Token type for bearer token
@@ -244,6 +249,17 @@ components:
       example: client_credentials
       enum:
       - client_credentials
+    ExternalToken:
+      pattern: "^[ -~]{1,4096}$"
+      type: string
+      description: External token
+      example: eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJOZXhpIiwicG95bnQuZGlkIjoidXJuOnRpZDo1NTYyYjhlZC1lODljLTMzMmEtYThkYy1jYTA4MTcxMzUxMTAiLCJwb3ludC5kc3QiOiJEIiwicG95bnQub3JnIjoiMGU2Zjc4ODYtMDk1Ni00NDA1LWJjNDgtYzE5ODY4ZDdlZTIyIiwicG95bnQuc2N0IjoiVSIsImlzcyI6Imh0dHBzOlwvXC9zZXJ2aWNlcy1ldS5wb3ludC5uZXQiLCJwb3ludC51cmUiOiJPIiwicG95bnQua2lkIjozOTMyNDI1MjY4MDY5NDA5MjM0LCJwb3ludC5zY3YiOiJOZXhpIiwicG95bnQuc3RyIjoiZDNmZDNmZDMtMTg5ZC00N2M4LThjMzYtYjY4NWRkNjBkOTY0IiwiYXVkIjoidXJuOnRpZDo1NTYyYjhlZC1lODljLTMzMmEtYThkYy1jYTA4MTcxMzUxMTAiLCJwb3ludC51aWQiOjM3MzY1NzQsInBveW50LmJpeiI6IjRiN2ViOTRiLTEwYzktNGYxMS1hMTBlLTcyOTJiMjlhYjExNSIsImV4cCI6MTY4MDc4MzUzNiwiaWF0IjoxNjgwNjk3MTM2LCJqdGkiOiI3MjBmMDFlZS1iZDk4LTRjYjItOTU2Mi0xZjI4YWY2NGJhZGYifQ.dTuvtzqy9oPWIN4NIBdhIR09Xpm70dgRCP-ybuVLo24DwqaysPKNmEHDXcq2gGE1w2L6e783_PXRK3RI0j1TQRFeLRbiPzN5imBdrJ2LlV8QNdkElOl2x32j652YeFcoAitBzFss_Do0_rquU_008eeIXWa-B-AiMsdAqgLUiMigsTT42rQYr7Mb8Am_NWwvZ9-DWiox6HbuUNUo3TStBmLervqlQ5j2_3AzcOILp8cJX0699fw7Y6gcu_pNHgjswqD0UVPSAmHf_bqFAH6b98qHVKe3isMSoktYi4FfWdpG1ykviEp9Ii0QKfeLnqyIR6g2o2XzGlDv7Usv5ouiXg
+    ExternalTokenGrantType:
+      type: string
+      description: Grant type to get an access token by means of external token
+      example: poynt_token
+      enum:
+      - poynt_token
     KeyType:
       type: string
       description: Key type
@@ -356,6 +372,32 @@ components:
       example:
         grant_type: client_credentials
         client_id: d0d654e6-97da-4848-b568-99fedccb642b
+    GetAccessTokenByExternalToken:
+      required:
+      - add_data
+      - client_id
+      - ext_token
+      - grant_type
+      type: object
+      properties:
+        grant_type:
+          $ref: '#/components/schemas/ExternalTokenGrantType'
+        ext_token:
+          $ref: '#/components/schemas/ExternalToken'
+        add_data:
+          $ref: '#/components/schemas/AdditionalData'
+        scope:
+          $ref: '#/components/schemas/OfflineAccessScope'
+        client_id:
+          $ref: '#/components/schemas/UUID'
+      additionalProperties: true
+      description: Request to get an access token by means of external token
+      example:
+        grant_type: poynt_token
+        ext_token: eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJOZXhpIiwicG95bnQuZGlkIjoidXJuOnRpZDo1NTYyYjhlZC1lODljLTMzMmEtYThkYy1jYTA4MTcxMzUxMTAiLCJwb3ludC5kc3QiOiJEIiwicG95bnQub3JnIjoiMGU2Zjc4ODYtMDk1Ni00NDA1LWJjNDgtYzE5ODY4ZDdlZTIyIiwicG95bnQuc2N0IjoiVSIsImlzcyI6Imh0dHBzOlwvXC9zZXJ2aWNlcy1ldS5wb3ludC5uZXQiLCJwb3ludC51cmUiOiJPIiwicG95bnQua2lkIjozOTMyNDI1MjY4MDY5NDA5MjM0LCJwb3ludC5zY3YiOiJOZXhpIiwicG95bnQuc3RyIjoiZDNmZDNmZDMtMTg5ZC00N2M4LThjMzYtYjY4NWRkNjBkOTY0IiwiYXVkIjoidXJuOnRpZDo1NTYyYjhlZC1lODljLTMzMmEtYThkYy1jYTA4MTcxMzUxMTAiLCJwb3ludC51aWQiOjM3MzY1NzQsInBveW50LmJpeiI6IjRiN2ViOTRiLTEwYzktNGYxMS1hMTBlLTcyOTJiMjlhYjExNSIsImV4cCI6MTY4MDc4MzUzNiwiaWF0IjoxNjgwNjk3MTM2LCJqdGkiOiI3MjBmMDFlZS1iZDk4LTRjYjItOTU2Mi0xZjI4YWY2NGJhZGYifQ.dTuvtzqy9oPWIN4NIBdhIR09Xpm70dgRCP-ybuVLo24DwqaysPKNmEHDXcq2gGE1w2L6e783_PXRK3RI0j1TQRFeLRbiPzN5imBdrJ2LlV8QNdkElOl2x32j652YeFcoAitBzFss_Do0_rquU_008eeIXWa-B-AiMsdAqgLUiMigsTT42rQYr7Mb8Am_NWwvZ9-DWiox6HbuUNUo3TStBmLervqlQ5j2_3AzcOILp8cJX0699fw7Y6gcu_pNHgjswqD0UVPSAmHf_bqFAH6b98qHVKe3isMSoktYi4FfWdpG1ykviEp9Ii0QKfeLnqyIR6g2o2XzGlDv7Usv5ouiXg
+        add_data: 4b7eb94b-10c9-4f11-a10e-7292b29ab115
+        scope: offline_access
+        client_id: d0d654e6-97da-4848-b568-99fedccb642b
     GetAccessTokenByPassword:
       required:
       - client_id
@@ -374,7 +416,7 @@ components:
           $ref: '#/components/schemas/OfflineAccessScope'
         client_id:
           $ref: '#/components/schemas/UUID'
-      additionalProperties: false
+      additionalProperties: true
       description: Request to get an access token by means of resource owner password
       example:
         grant_type: password
@@ -451,7 +493,7 @@ components:
           $ref: '#/components/schemas/UUID'
         refresh_token:
           $ref: '#/components/schemas/Token'
-      additionalProperties: false
+      additionalProperties: true
       description: Request to get an access token by means of a refresh token
       example:
         grant_type: refresh_token
@@ -579,13 +621,14 @@ components:
   requestBodies:
     GetAccessTokenByPassword:
       description: Request to get an access token by means of username and password
-        or by refresh token
+        or by refresh token or by external token
       content:
         application/x-www-form-urlencoded:
           schema:
             oneOf:
             - $ref: '#/components/schemas/GetAccessTokenByPassword'
             - $ref: '#/components/schemas/RefreshAccessToken'
+            - $ref: '#/components/schemas/GetAccessTokenByExternalToken'
     GetAccessTokenByApiKey:
       description: Request to get an access token by means of client credentials
       content:
