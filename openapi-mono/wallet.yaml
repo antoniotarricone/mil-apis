@@ -246,9 +246,12 @@ components:
               and notice number
             activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
               PA tax code and notice number
-            close: Close the payment of a set of notices
+            preConfirmOrAbort: Pre-confirm or abort the payment of a set of notices
+            confirm: Confirm the payment of a set of notices
             getPaymentStatus: Retrieve the status of the payment of a set of payment
               notices
+            getLastTransactions: Get last 30 transactions executed by the client in
+              the last 30 days
             getFee: Calculate the fee amount for a set of payment notices
             getServices: Return the list of services available for end-users
             deleteSessionById: Delete a session by ID
