@@ -11,7 +11,7 @@ declare -a descriptors=(
   "session.yaml"
   "wallet.yaml"
   "acquirer-conf.yaml"
-  "payment-notice-internal.yaml"
+  "idp.yaml"
 )
 
 # Prepare destination folder.
