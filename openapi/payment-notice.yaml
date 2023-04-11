@@ -469,11 +469,11 @@ components:
         - PRE_CONFIRM
       example: "PRE_CONFIRM"
       
-    QrCode:
-      description: String encoded by the QR-code
-      type: string
-      pattern: "^[ -~]{6}\\|[ -~]{3}\\|[0-9]{18}\\|[0-9]{11}\\|[0-9]{2,11}$"
-      example: "PAGOPA|002|000000000000000000|00000000000|9999"
+    # QrCode:
+    #   description: String encoded by the QR-code
+    #   type: string
+    #   pattern: "^[ -~]{6}\\|[ -~]{3}\\|[0-9]{18}\\|[0-9]{11}\\|[0-9]{2,11}$"
+    #   example: "PAGOPA|002|000000000000000000|00000000000|9999"
 
     QrCodeBase64UrlEnc:
       description: Base64Url of the string encoded by the QR-code. This is due to a bug of Azure routing system which decodes %2F before routing the request.
@@ -601,7 +601,7 @@ components:
         transactionId: "517a4216840E461fB011036A0fd134E1"
         acquirerId: "4585625"
         channel: "POS"
-        merchant: "28405fHfk73x88D"
+        merchantId: "28405fHfk73x88D"
         terminalId: "0aB9wXyZ"
         insertTimestamp: "2023-04-11T16:20:34"
         notices:
@@ -664,7 +664,7 @@ components:
           maxItems: 30
           items:
             $ref: '#/components/schemas/PaymentStatus'
-      examples:
+      example:
         transactions:
           - transactionId: "517a4216840E461fB011036A0fd134E1"
             acquirerId: "4585625"
@@ -718,34 +718,6 @@ components:
             office: "Ufficio di Roma"
             debtor: "Mario Rossi"
             
-    PaymentDetails:
-      description: Details of a payment notice
-      type: object
-      additionalProperties: false
-      properties:
-        paymentToken:
-          $ref: '#/components/schemas/PaymentToken'
-        description:
-          $ref: '#/components/schemas/Description'
-        creditorReferenceId:
-          $ref: '#/components/schemas/CreditorReferenceId'
-        paTaxCode:
-          $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
-        company:
-          $ref: '#/components/schemas/Company'
-        office:
-          $ref: '#/components/schemas/Office'
-        debtor:
-          $ref: '#/components/schemas/Debtor'
-      example:
-        paymentToken: "648fhg36s95jfg7DS"
-        description: "Health ticket for chest x-ray"
-        creditorReferenceId: "4839d50603fssfW5X"
-        paTaxCode: "15376371009"
-        company: "ASL Roma"
-        office: "Ufficio di Roma"
-        debtor: "Mario Rossi"
-    
     PaymentDetailsByNodo:
       description: Details of a payment notice communicated by the Nodo
       type: object
@@ -867,7 +839,7 @@ components:
     PreConfirm:
       description: Request to pre-confirm the payment of a set of payment notices
       type: object
-      additionalProperties: false
+      additionalProperties: true
       properties:
         outcome:
           $ref: '#/components/schemas/PreConfirmOutcome'
@@ -876,21 +848,21 @@ components:
           maxItems: 5
           items:
             $ref: '#/components/schemas/PaymentToken'
-          transactionId:
-            $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
-          fee:
-            $ref: 'common-payment-notice.yaml#/components/schemas/EuroCents'
-          required:
-            - outcome
-            - paymentTokens
-            - transactionId
-            - fee
-          example:
-            outcome: "PRE_CONFIRM"
-            paymentTokens:
-              - "648fhg36s95jfg7DS"
-            transactionId: "517a4216840E461fB011036A0fd134E1"
-            fee: 50
+        transactionId:
+          $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
+        fee:
+          $ref: 'common-payment-notice.yaml#/components/schemas/EuroCents'
+      required:
+        - outcome
+        - paymentTokens
+        - transactionId
+        - fee
+      example:
+        outcome: "PRE_CONFIRM"
+        paymentTokens:
+          - "648fhg36s95jfg7DS"
+        transactionId: "517a4216840E461fB011036A0fd134E1"
+        fee: 50
     
     Abort:
       description: Request to abort the payment of a set of payment notices
@@ -903,13 +875,13 @@ components:
           maxItems: 5
           items:
             $ref: '#/components/schemas/PaymentToken'
-          required:
-            - outcome
-            - paymentTokens
-          example:
-            outcome: "ABORT"
-            paymentTokens:
-              - "648fhg36s95jfg7DS"
+      required:
+        - outcome
+        - paymentTokens
+      example:
+        outcome: "ABORT"
+        paymentTokens:
+          - "648fhg36s95jfg7DS"
             
   # ========================================================
   # Request bodies
