@@ -542,13 +542,13 @@ components:
         transactionId:
           $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
         acquirerId:
-          $ref: 'common.yaml#/components/parameters/AcquirerId'
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
         channel:
-          $ref: 'common.yaml#/components/parameters/Channel'
+          $ref: 'common.yaml#/components/schemas/Channel'
         merchantId:
-          $ref: 'common.yaml#/components/parameters/MerchantId'
+          $ref: 'common.yaml#/components/schemas/MerchantId'
         terminalId:
-          $ref: 'common.yaml#/components/parameters/TerminalId'
+          $ref: 'common.yaml#/components/schemas/TerminalId'
         insertTimestamp:
           description: Record registration timestamp (timestamp of pre-confirm or abort)
           type: string

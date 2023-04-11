@@ -11,9 +11,35 @@ components:
   # Schemas
   # ========================================================
   schemas:
-    # ------------------------------------------------------
-    # Basic types
-    # ------------------------------------------------------
+    AcquirerId:
+      description: Acquirer ID assigned by PagoPA
+      type: string
+      pattern: "^\\d{1,11}$"
+      example: "4585625"
+
+    Channel:
+      description: Channel originating the request
+      enum:
+        - ATM
+        - POS
+        - TOTEM
+        - CASH_REGISTER
+        - CSA
+      type: string
+      example: "ATM"
+
+    MerchantId:
+      description: Merchant ID. Mandatory when Channel equals POS.
+      type: string
+      pattern: "^[0-9a-zA-Z]{1,15}$"
+      example: "28405fHfk73x88D"
+    
+    TerminalId:
+      description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
+      type: string
+      pattern: "^[0-9a-zA-Z]{1,8}$"
+      example: "0aB9wXyZ"
+    
     Error:
       description: Error code
       type: string
@@ -110,9 +136,7 @@ components:
       description: Acquirer ID assigned by PagoPA
       required: true
       schema:
-        type: string
-        pattern: "^\\d{1,11}$"
-        example: "4585625"
+        $ref: '#/components/schemas/AcquirerId'
 
     Channel:
       name: Channel
@@ -120,14 +144,7 @@ components:
       description: Channel originating the request
       required: true
       schema:
-        enum:
-          - ATM
-          - POS
-          - TOTEM
-          - CASH_REGISTER
-          - CSA
-        type: string
-        example: "ATM"
+        $ref: '#/components/schemas/Channel'
 
     HeaderSessionId:
       name: id
@@ -143,9 +160,7 @@ components:
       in: header
       required: false
       schema:
-        type: string
-        pattern: "^[0-9a-zA-Z]{1,15}$"
-        example: "28405fHfk73x88D"
+        $ref: '#/components/schemas/MerchantId'
     
     RequestId:
       name: RequestId
@@ -169,9 +184,7 @@ components:
       description: ID of the terminal originating the transaction. It must be unique per acquirer and channel.
       required: true
       schema:
-        type: string
-        pattern: "^[0-9a-zA-Z]{1,8}$"
-        example: "0aB9wXyZ"
+        $ref: '#/components/schemas/TerminalId'
 
   # ========================================================
   # Responses

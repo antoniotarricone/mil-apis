@@ -39,39 +39,26 @@ paths:
         description: Acquirer ID assigned by PagoPA
         required: true
         schema:
-          pattern: "^\\d{1,11}$"
-          type: string
-          example: "4585625"
+          $ref: '#/components/schemas/AcquirerId'
       - name: Channel
         in: header
         description: Channel originating the request
         required: true
         schema:
-          type: string
-          example: ATM
-          enum:
-          - ATM
-          - POS
-          - TOTEM
-          - CASH_REGISTER
-          - CSA
+          $ref: '#/components/schemas/Channel'
       - name: MerchantId
         in: header
         description: Merchant ID. Mandatory when Channel equals POS.
         required: false
         schema:
-          pattern: "^[0-9a-zA-Z]{1,15}$"
-          type: string
-          example: 28405fHfk73x88D
+          $ref: '#/components/schemas/MerchantId'
       - name: TerminalId
         in: header
         description: ID of the terminal originating the transaction. It must be unique
           per acquirer and channel.
         required: true
         schema:
-          pattern: "^[0-9a-zA-Z]{1,8}$"
-          type: string
-          example: 0aB9wXyZ
+          $ref: '#/components/schemas/TerminalId'
       requestBody:
         $ref: '#/components/requestBodies/GetAccessTokenByPassword'
       responses:
@@ -134,39 +121,26 @@ paths:
         description: Acquirer ID assigned by PagoPA
         required: true
         schema:
-          pattern: "^\\d{1,11}$"
-          type: string
-          example: "4585625"
+          $ref: '#/components/schemas/AcquirerId'
       - name: Channel
         in: header
         description: Channel originating the request
         required: true
         schema:
-          type: string
-          example: ATM
-          enum:
-          - ATM
-          - POS
-          - TOTEM
-          - CASH_REGISTER
-          - CSA
+          $ref: '#/components/schemas/Channel'
       - name: MerchantId
         in: header
         description: Merchant ID. Mandatory when Channel equals POS.
         required: false
         schema:
-          pattern: "^[0-9a-zA-Z]{1,15}$"
-          type: string
-          example: 28405fHfk73x88D
+          $ref: '#/components/schemas/MerchantId'
       - name: TerminalId
         in: header
         description: ID of the terminal originating the transaction. It must be unique
           per acquirer and channel.
         required: true
         schema:
-          pattern: "^[0-9a-zA-Z]{1,8}$"
-          type: string
-          example: 0aB9wXyZ
+          $ref: '#/components/schemas/TerminalId'
       requestBody:
         $ref: '#/components/requestBodies/GetAccessTokenByApiKey'
       responses:
@@ -505,6 +479,32 @@ components:
       description: UUID
       format: uuid
       example: d0d654e6-97da-4848-b568-99fedccb642b
+    AcquirerId:
+      pattern: "^\\d{1,11}$"
+      type: string
+      description: Acquirer ID assigned by PagoPA
+      example: "4585625"
+    Channel:
+      type: string
+      description: Channel originating the request
+      example: ATM
+      enum:
+      - ATM
+      - POS
+      - TOTEM
+      - CASH_REGISTER
+      - CSA
+    MerchantId:
+      pattern: "^[0-9a-zA-Z]{1,15}$"
+      type: string
+      description: Merchant ID. Mandatory when Channel equals POS.
+      example: 28405fHfk73x88D
+    TerminalId:
+      pattern: "^[0-9a-zA-Z]{1,8}$"
+      type: string
+      description: ID of the terminal originating the transaction. It must be unique
+        per acquirer and channel.
+      example: 0aB9wXyZ
     Errors:
       required:
       - errors
@@ -582,32 +582,21 @@ components:
       description: Acquirer ID assigned by PagoPA
       required: true
       schema:
-        pattern: "^\\d{1,11}$"
-        type: string
-        example: "4585625"
+        $ref: '#/components/schemas/AcquirerId'
     Channel:
       name: Channel
       in: header
       description: Channel originating the request
       required: true
       schema:
-        type: string
-        example: ATM
-        enum:
-        - ATM
-        - POS
-        - TOTEM
-        - CASH_REGISTER
-        - CSA
+        $ref: '#/components/schemas/Channel'
     MerchantId:
       name: MerchantId
       in: header
       description: Merchant ID. Mandatory when Channel equals POS.
       required: false
       schema:
-        pattern: "^[0-9a-zA-Z]{1,15}$"
-        type: string
-        example: 28405fHfk73x88D
+        $ref: '#/components/schemas/MerchantId'
     TerminalId:
       name: TerminalId
       in: header
@@ -615,9 +604,7 @@ components:
         per acquirer and channel.
       required: true
       schema:
-        pattern: "^[0-9a-zA-Z]{1,8}$"
-        type: string
-        example: 0aB9wXyZ
+        $ref: '#/components/schemas/TerminalId'
   requestBodies:
     GetAccessTokenByPassword:
       description: Request to get an access token by means of username and password
