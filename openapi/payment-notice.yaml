@@ -181,18 +181,18 @@ paths:
       - $ref: 'common.yaml#/components/parameters/TerminalId'
 
     # ------------------------------------------------------
-    # Pre-confirm or abort the payment of a set of notices
+    # Pre-close or abort the payment of a set of notices
     # ------------------------------------------------------
     post:
-      operationId: preConfirmOrAbort
-      summary: Pre-confirm or abort the payment of a set of notices
+      operationId: preCloseOrAbort
+      summary: Pre-close or abort the payment of a set of notices
       security: 
-        - oAuth2: [ preConfirmOrAbort ]
+        - oAuth2: [ preCloseOrAbort ]
       requestBody:
-        $ref: '#/components/requestBodies/PreConfirmOrAbort'
+        $ref: '#/components/requestBodies/PreCloseOrAbort'
       responses:
         "201":
-          $ref: '#/components/responses/PreConfirmOrAbortProcessed'
+          $ref: '#/components/responses/PreCloseOrAbortProcessed'
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
@@ -247,13 +247,14 @@ paths:
           $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
 
     # ------------------------------------------------------
-    # Confirm the payment of a set of notices
+    # Comunicate the outcome of the e-money transaction
+    # executed to pay a set of notices
     # ------------------------------------------------------
     patch:
-      operationId: confirm
-      summary: Confirm the payment of a set of notices
+      operationId: close
+      summary: Comunicate the outcome of the e-money transaction executed to pay a set of notices
       security: 
-        - oAuth2: [ confirm ]
+        - oAuth2: [ close ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
@@ -262,10 +263,10 @@ paths:
         - $ref: 'common.yaml#/components/parameters/MerchantId'
         - $ref: 'common.yaml#/components/parameters/TerminalId'
       requestBody:
-        $ref: '#/components/requestBodies/Confirm'
+        $ref: '#/components/requestBodies/Close'
       responses:
         "201":
-          $ref: '#/components/responses/ConfirmProcessed'
+          $ref: '#/components/responses/CloseProcessed'
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
@@ -384,13 +385,13 @@ components:
       pattern: "^[ -~]{1,140}$"
       example: "ASL Roma"
     
-    ConfirmOutcome:
-      description: Outcome for confirm operation
+    CloseOutcome:
+      description: Outcome for close operation
       type: string
       enum:
-        - CONFIRM
+        - CLOSE
         - ERROR_ON_PAYMENT
-      example: "CONFIRM"
+      example: "CLOSE"
 
     CreditorReferenceId:
       description: ID for the creditor company
@@ -469,12 +470,12 @@ components:
       pattern: "^[ -~]{1,35}$"
       example: "648fhg36s95jfg7DS"
 
-    PreConfirmOutcome:
-      description: Constant value (PRE_CONFIRM) outcome
+    PreCloseOutcome:
+      description: Constant value (PRE_CLOSE) outcome
       type: string
       enum:
-        - PRE_CONFIRM
-      example: "PRE_CONFIRM"
+        - PRE_CLOSE
+      example: "PRE_CLOSE"
       
     # QrCode:
     #   description: String encoded by the QR-code
@@ -492,14 +493,14 @@ components:
       description: Status of the transaction
       type: string
       enum:
-        - PRE_CONFIRM
+        - PRE_CLOSE
         - PENDING
         - ERROR_ON_CLOSE
-        - CONFIRMED
+        - CLOSED
         - ERROR_ON_RESULT
         - ERROR_ON_PAYMENT
         - ABORTED
-      example: "CONFIRMED"
+      example: "CLOSED"
 
     # ------------------------------------------------------
     # Common complex types
@@ -533,10 +534,10 @@ components:
     #   ],
     #   "totalAmount": ...,
     #   "fee": ...,                       << Not present for ABORTED transactions
-    #   "status": "PRE_CONFIRM" | "PENDING" | "ERROR_ON_CLOSE" | "CONFIRMED" | "ERROR_ON_RESULT" | "ERROR_ON_PAYMENT" | "ABORTED"
-    #   "paymentMethod": "...",           << Confirm
-    #   "paymentTimestamp": "...",        << Confirm
-    #   "confirmTimestamp": "...",        << Confirm
+    #   "status": "PRE_CLOSE" | "PENDING" | "ERROR_ON_CLOSE" | "CLOSED" | "ERROR_ON_RESULT" | "ERROR_ON_PAYMENT" | "ABORTED"
+    #   "paymentMethod": "...",           << Close
+    #   "paymentTimestamp": "...",        << Close
+    #   "closeTimestamp": "...",          << Close
     #   "paymentDate": "...",             << Callback
     #   "callbackTimestamp": "..."        << Callback
     # }
@@ -557,7 +558,7 @@ components:
         terminalId:
           $ref: 'common.yaml#/components/schemas/TerminalId'
         insertTimestamp:
-          description: Record registration timestamp (timestamp of pre-confirm or abort)
+          description: Record registration timestamp (timestamp of pre-close or abort)
           type: string
           format: date-time
           maxLength: 19
@@ -580,7 +581,7 @@ components:
           type: string
           format: date-time
           maxLength: 19
-        confirmTimestamp:
+        closeTimestamp:
           description: Timestamp of the confirmation from the Client
           type: string
           format: date-time
@@ -621,7 +622,7 @@ components:
             office: "Ufficio di Roma"
         totalAmount: 12395
         fee: 50
-        status: "PRE_CONFIRM"
+        status: "PRE_CLOSE"
     
     PaymentNoticeFullDetails:
       description: Full details of the payment notice
@@ -689,7 +690,7 @@ components:
                 office: "Ufficio di Roma"
             totalAmount: 12395
             fee: 50
-            status: "PRE_CONFIRM"
+            status: "PRE_CLOSE"
         
     PaymentStatusByNodo:
       description: Payment status communicated by the Nodo
@@ -841,15 +842,15 @@ components:
             category: "KTM"
 
     # ------------------------------------------------------
-    # Complex types for preConfirmOrAbort
+    # Complex types for preCloseOrAbort
     # ------------------------------------------------------
-    PreConfirm:
-      description: Request to pre-confirm the payment of a set of payment notices
+    PreClose:
+      description: Request to pre-close the payment of a set of payment notices
       type: object
       additionalProperties: true
       properties:
         outcome:
-          $ref: '#/components/schemas/PreConfirmOutcome'
+          $ref: '#/components/schemas/PreCloseOutcome'
         paymentTokens:
           type: array
           maxItems: 5
@@ -865,7 +866,7 @@ components:
         - transactionId
         - fee
       example:
-        outcome: "PRE_CONFIRM"
+        outcome: "PRE_CLOSE"
         paymentTokens:
           - "648fhg36s95jfg7DS"
         transactionId: "517a4216840E461fB011036A0fd134E1"
@@ -918,22 +919,22 @@ components:
               amount: 12345
 
     # ------------------------------------------------------
-    # For preConfirmOrAbort
+    # For preCloseOrAbort
     # ------------------------------------------------------
-    PreConfirmOrAbort:
-      description: Request to pre-confirm or abort a transaction
+    PreCloseOrAbort:
+      description: Request to pre-close or abort a transaction
       content:
         application/json:
           schema:
             oneOf:
-              - $ref: '#/components/schemas/PreConfirm'
+              - $ref: '#/components/schemas/PreClose'
               - $ref: '#/components/schemas/Abort'       
     
     # ------------------------------------------------------
-    # For confirm
+    # For close
     # ------------------------------------------------------
-    Confirm:
-      description: Request to confirm a transaction
+    Close:
+      description: Request to close a transaction
       content:
         application/json:
           schema:
@@ -941,7 +942,7 @@ components:
             additionalProperties: false
             properties:
               outcome:
-                $ref: '#/components/schemas/ConfirmOutcome'
+                $ref: '#/components/schemas/CloseOutcome'
               paymentMethod:
                 $ref: 'common-payment-notice.yaml#/components/schemas/PaymentMethod'
               paymentTimestamp:
@@ -954,7 +955,7 @@ components:
               - paymentMethod
               - paymentTimestamp
             example:
-              outcome: "CONFIRM"
+              outcome: "CLOSE"
               paymentMethod: "PAGOBANCOMAT"
               paymentTimestamp: "2022-11-12T08:53:55"
 
@@ -998,10 +999,10 @@ components:
               - $ref: '#/components/schemas/VerifyOrActivateKo'
 
     # ------------------------------------------------------
-    # For preConfirmOrAbort
+    # For preCloseOrAbort
     # ------------------------------------------------------
-    PreConfirmOrAbortProcessed:
-      description: Response to pre-confirm ora abort successfully processed
+    PreCloseOrAbortProcessed:
+      description: Response to pre-close ora abort successfully processed
       headers:
         Location:
           description: URL to get the status of the transaction
@@ -1022,10 +1023,10 @@ components:
               outcome: "OK"
     
     # ------------------------------------------------------
-    # For confirm
+    # For close
     # ------------------------------------------------------
-    ConfirmProcessed:
-      description: Response to confirm successfully processed
+    CloseProcessed:
+      description: Response to close successfully processed
       headers:
         Location:
           description: URL to check the status of payment confirmation. If outcome = OK the field is present.

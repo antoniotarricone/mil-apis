@@ -952,8 +952,8 @@ components:
               and notice number
             activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
               PA tax code and notice number
-            preConfirmOrAbort: Pre-confirm or abort the payment of a set of notices
-            confirm: Confirm the payment of a set of notices
+            preCloseOrAbort: Pre-close or abort the payment of a set of notices
+            close: Close the payment of a set of notices
             getPaymentStatus: Retrieve the status of the payment of a set of payment
               notices
             getLastTransactions: Get last 30 transactions executed by the client in
@@ -975,8 +975,8 @@ components:
               and notice number
             activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
               PA tax code and notice number
-            preConfirmOrAbort: Pre-confirm or abort the payment of a set of notices
-            confirm: Confirm the payment of a set of notices
+            preCloseOrAbort: Pre-close or abort the payment of a set of notices
+            close: Close the payment of a set of notices
             getPaymentStatus: Retrieve the status of the payment of a set of payment
               notices
             getLastTransactions: Get last 30 transactions executed by the client in

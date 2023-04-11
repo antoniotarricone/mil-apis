@@ -471,8 +471,8 @@ paths:
       - oAuth2:
         - getLastTransactions
     post:
-      summary: Pre-confirm or abort the payment of a set of notices
-      operationId: preConfirmOrAbort
+      summary: Pre-close or abort the payment of a set of notices
+      operationId: preCloseOrAbort
       parameters:
       - name: RequestId
         in: header
@@ -517,10 +517,10 @@ paths:
         schema:
           $ref: '#/components/schemas/TerminalId'
       requestBody:
-        $ref: '#/components/requestBodies/PreConfirmOrAbort'
+        $ref: '#/components/requestBodies/PreCloseOrAbort'
       responses:
         "201":
-          description: Response to pre-confirm ora abort successfully processed
+          description: Response to pre-close ora abort successfully processed
           headers:
             Location:
               description: URL to get the status of the transaction
@@ -559,7 +559,7 @@ paths:
           description: Unexpected error
       security:
       - oAuth2:
-        - preConfirmOrAbort
+        - preCloseOrAbort
   /payments/{transactionId}:
     get:
       summary: Retrieve the status of the payment of a set of payment notices
@@ -706,8 +706,9 @@ paths:
       security:
       - ApiKeyAuth: []
     patch:
-      summary: Confirm the payment of a set of notices
-      operationId: confirm
+      summary: Comunicate the outcome of the e-money transaction executed to pay a
+        set of notices
+      operationId: close
       parameters:
       - name: transactionId
         in: path
@@ -760,10 +761,10 @@ paths:
         schema:
           $ref: '#/components/schemas/TerminalId'
       requestBody:
-        $ref: '#/components/requestBodies/Confirm'
+        $ref: '#/components/requestBodies/Close'
       responses:
         "201":
-          description: Response to confirm successfully processed
+          description: Response to close successfully processed
           headers:
             Location:
               description: URL to check the status of payment confirmation. If outcome
@@ -821,7 +822,7 @@ paths:
           description: Unexpected error
       security:
       - oAuth2:
-        - confirm
+        - close
 components:
   schemas:
     AbortOutcome:
@@ -842,12 +843,12 @@ components:
       type: string
       description: Name of the creditor company
       example: ASL Roma
-    ConfirmOutcome:
+    CloseOutcome:
       type: string
-      description: Outcome for confirm operation
-      example: CONFIRM
+      description: Outcome for close operation
+      example: CLOSE
       enum:
-      - CONFIRM
+      - CLOSE
       - ERROR_ON_PAYMENT
     CreditorReferenceId:
       pattern: "^[ -~]{1,35}$"
@@ -916,12 +917,12 @@ components:
       type: string
       description: ID of the payment activation
       example: 648fhg36s95jfg7DS
-    PreConfirmOutcome:
+    PreCloseOutcome:
       type: string
-      description: Constant value (PRE_CONFIRM) outcome
-      example: PRE_CONFIRM
+      description: Constant value (PRE_CLOSE) outcome
+      example: PRE_CLOSE
       enum:
-      - PRE_CONFIRM
+      - PRE_CLOSE
     QrCodeBase64UrlEnc:
       pattern: "^[a-zA-Z0-9_-]{32,128}$"
       type: string
@@ -931,12 +932,12 @@ components:
     TransactionStatus:
       type: string
       description: Status of the transaction
-      example: CONFIRMED
+      example: CLOSED
       enum:
-      - PRE_CONFIRM
+      - PRE_CLOSE
       - PENDING
       - ERROR_ON_CLOSE
-      - CONFIRMED
+      - CLOSED
       - ERROR_ON_RESULT
       - ERROR_ON_PAYMENT
       - ABORTED
@@ -965,8 +966,7 @@ components:
         insertTimestamp:
           maxLength: 19
           type: string
-          description: Record registration timestamp (timestamp of pre-confirm or
-            abort)
+          description: Record registration timestamp (timestamp of pre-close or abort)
           format: date-time
         notices:
           maxItems: 5
@@ -987,7 +987,7 @@ components:
           type: string
           description: Timestamp of e-money transaction
           format: date-time
-        confirmTimestamp:
+        closeTimestamp:
           maxLength: 19
           type: string
           description: Timestamp of the confirmation from the Client
@@ -1021,7 +1021,7 @@ components:
           office: Ufficio di Roma
         totalAmount: 12395
         fee: 50
-        status: PRE_CONFIRM
+        status: PRE_CLOSE
     PaymentNoticeFullDetails:
       required:
       - noticeNumber
@@ -1087,7 +1087,7 @@ components:
             office: Ufficio di Roma
           totalAmount: 12395
           fee: 50
-          status: PRE_CONFIRM
+          status: PRE_CLOSE
     PaymentStatusByNodo:
       required:
       - outcome
@@ -1224,7 +1224,7 @@ components:
         transfers:
         - paTaxCode: "15376371009"
           category: KTM
-    PreConfirm:
+    PreClose:
       required:
       - fee
       - outcome
@@ -1233,7 +1233,7 @@ components:
       type: object
       properties:
         outcome:
-          $ref: '#/components/schemas/PreConfirmOutcome'
+          $ref: '#/components/schemas/PreCloseOutcome'
         paymentTokens:
           maxItems: 5
           type: array
@@ -1244,9 +1244,9 @@ components:
         fee:
           $ref: '#/components/schemas/EuroCents'
       additionalProperties: true
-      description: Request to pre-confirm the payment of a set of payment notices
+      description: Request to pre-close the payment of a set of payment notices
       example:
-        outcome: PRE_CONFIRM
+        outcome: PRE_CLOSE
         paymentTokens:
         - 648fhg36s95jfg7DS
         transactionId: 517a4216840E461fB011036A0fd134E1
@@ -1431,8 +1431,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/inline_response_200_1'
-    PreConfirmOrAbortProcessed:
-      description: Response to pre-confirm ora abort successfully processed
+    PreCloseOrAbortProcessed:
+      description: Response to pre-close ora abort successfully processed
       headers:
         Location:
           description: URL to get the status of the transaction
@@ -1445,8 +1445,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/inline_response_201'
-    ConfirmProcessed:
-      description: Response to confirm successfully processed
+    CloseProcessed:
+      description: Response to close successfully processed
       headers:
         Location:
           description: URL to check the status of payment confirmation. If outcome
@@ -1574,16 +1574,16 @@ components:
             example:
               idempotencyKey: 47583764545_Ahf479elk0
               amount: 12345
-    PreConfirmOrAbort:
-      description: Request to pre-confirm or abort a transaction
+    PreCloseOrAbort:
+      description: Request to pre-close or abort a transaction
       content:
         application/json:
           schema:
             oneOf:
-            - $ref: '#/components/schemas/PreConfirm'
+            - $ref: '#/components/schemas/PreClose'
             - $ref: '#/components/schemas/Abort'
-    Confirm:
-      description: Request to confirm a transaction
+    Close:
+      description: Request to close a transaction
       content:
         application/json:
           schema:
@@ -1594,7 +1594,7 @@ components:
             type: object
             properties:
               outcome:
-                $ref: '#/components/schemas/ConfirmOutcome'
+                $ref: '#/components/schemas/CloseOutcome'
               paymentMethod:
                 $ref: '#/components/schemas/PaymentMethod'
               paymentTimestamp:
@@ -1604,7 +1604,7 @@ components:
                 format: date-time
             additionalProperties: false
             example:
-              outcome: CONFIRM
+              outcome: CLOSE
               paymentMethod: PAGOBANCOMAT
               paymentTimestamp: 2022-11-12T08:53:55
     PaymentStatusByNodo:
@@ -1632,8 +1632,8 @@ components:
               and notice number
             activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
               PA tax code and notice number
-            preConfirmOrAbort: Pre-confirm or abort the payment of a set of notices
-            confirm: Confirm the payment of a set of notices
+            preCloseOrAbort: Pre-close or abort the payment of a set of notices
+            close: Close the payment of a set of notices
             getPaymentStatus: Retrieve the status of the payment of a set of payment
               notices
             getLastTransactions: Get last 30 transactions executed by the client in
@@ -1655,8 +1655,8 @@ components:
               and notice number
             activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
               PA tax code and notice number
-            preConfirmOrAbort: Pre-confirm or abort the payment of a set of notices
-            confirm: Confirm the payment of a set of notices
+            preCloseOrAbort: Pre-close or abort the payment of a set of notices
+            close: Close the payment of a set of notices
             getPaymentStatus: Retrieve the status of the payment of a set of payment
               notices
             getLastTransactions: Get last 30 transactions executed by the client in
