@@ -211,38 +211,6 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Confirm the payment of a set of notices
-    # ------------------------------------------------------
-    patch:
-      operationId: confirm
-      summary: Confirm the payment of a set of notices
-      security: 
-        - oAuth2: [ confirm ]
-      requestBody:
-        $ref: '#/components/requestBodies/Confirm'
-      responses:
-        "201":
-          $ref: '#/components/responses/ConfirmProcessed'
-        "400":
-          $ref: 'common.yaml#/components/responses/Error'
-        "401":
-          description: Access token is missing or invalid
-        "403":
-          description: Forbidden
-        "404":
-          description: Not found
-        "406":
-          description: Not acceptable. Did you require application/json?
-        "415":
-          description: Unsupported media type. Did you provide application/json?
-        "429":
-          description: Too many request
-        "500":
-          $ref: 'common.yaml#/components/responses/Error'
-        default:
-          description: Unexpected error
-
-    # ------------------------------------------------------
     # Get last 30 transactions executed by the client in the
     # last 30 days
     # ------------------------------------------------------
@@ -277,6 +245,45 @@ paths:
         required: true
         schema:
           $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
+
+    # ------------------------------------------------------
+    # Confirm the payment of a set of notices
+    # ------------------------------------------------------
+    patch:
+      operationId: confirm
+      summary: Confirm the payment of a set of notices
+      security: 
+        - oAuth2: [ confirm ]
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/MerchantId'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+      requestBody:
+        $ref: '#/components/requestBodies/Confirm'
+      responses:
+        "201":
+          $ref: '#/components/responses/ConfirmProcessed'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: Access token is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "415":
+          description: Unsupported media type. Did you provide application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
 
     # ------------------------------------------------------
     # Retrieve the status of the payment of a set of payment
