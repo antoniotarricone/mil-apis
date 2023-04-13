@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Payment Notice Microservice
-  version: 11.0.0
+  version: 12.0.0
   description: Payment Notice Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -201,6 +201,8 @@ paths:
           description: Forbidden
         "406":
           description: Not acceptable. Did you require application/json?
+        "409":
+          description: Transaction ID already exists
         "415":
           description: Unsupported media type. Did you provide application/json?
         "429":

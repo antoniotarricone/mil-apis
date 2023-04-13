@@ -1,6 +1,6 @@
 info:
   title: Common components for Payment Notice related services
-  version: 1.2.0
+  version: 2.0.0
   description: Payment Notice related services common components for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -46,7 +46,7 @@ components:
     TransactionId:
       description: Transaction ID
       type: string
-      pattern: "^[a-zA-Z0-9]{1,255}$"
+      pattern: "^[a-zA-Z0-9]{32}$"
       example: "517a4216840E461fB011036A0fd134E1"
 
     Transfer:

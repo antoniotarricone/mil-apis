@@ -6,7 +6,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 11.0.0
+  version: 12.0.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-payment-notice
   description: DEV
@@ -545,6 +545,8 @@ paths:
           description: Forbidden
         "406":
           description: Not acceptable. Did you require application/json?
+        "409":
+          description: Transaction ID already exists
         "415":
           description: Unsupported media type. Did you provide application/json?
         "429":
@@ -1333,7 +1335,7 @@ components:
       description: URI
       format: uri
     TransactionId:
-      pattern: "^[a-zA-Z0-9]{1,255}$"
+      pattern: "^[a-zA-Z0-9]{32}$"
       type: string
       description: Transaction ID
       example: 517a4216840E461fB011036A0fd134E1
