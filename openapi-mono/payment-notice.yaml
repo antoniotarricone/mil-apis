@@ -6,7 +6,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 12.0.0
+  version: 13.0.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-payment-notice
   description: DEV
@@ -520,7 +520,7 @@ paths:
         $ref: '#/components/requestBodies/PreCloseOrAbort'
       responses:
         "201":
-          description: Response to pre-close ora abort successfully processed
+          description: Response to pre-close or abort successfully processed
           headers:
             Location:
               description: URL to get the status of the transaction
@@ -533,6 +533,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_201'
+        "202":
+          description: Only for abort operation.
         "400":
           description: Error response
           content:
@@ -796,6 +798,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/inline_response_201_1'
+        "202":
+          description: Only for operation with KO outcome
         "400":
           description: Error response
           content:
@@ -1231,6 +1235,7 @@ components:
       - fee
       - outcome
       - paymentTokens
+      - totalAmount
       - transactionId
       type: object
       properties:
@@ -1243,6 +1248,8 @@ components:
             $ref: '#/components/schemas/PaymentToken'
         transactionId:
           $ref: '#/components/schemas/TransactionId'
+        totalAmount:
+          $ref: '#/components/schemas/EuroCents'
         fee:
           $ref: '#/components/schemas/EuroCents'
       additionalProperties: true
@@ -1252,6 +1259,7 @@ components:
         paymentTokens:
         - 648fhg36s95jfg7DS
         transactionId: 517a4216840E461fB011036A0fd134E1
+        totalAmount: 10000
         fee: 50
     Abort:
       required:
@@ -1434,7 +1442,7 @@ components:
           schema:
             $ref: '#/components/schemas/inline_response_200_1'
     PreCloseOrAbortProcessed:
-      description: Response to pre-close ora abort successfully processed
+      description: Response to pre-close or abort successfully processed
       headers:
         Location:
           description: URL to get the status of the transaction

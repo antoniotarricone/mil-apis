@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Payment Notice Microservice
-  version: 12.0.0
+  version: 13.0.0
   description: Payment Notice Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -193,6 +193,8 @@ paths:
       responses:
         "201":
           $ref: '#/components/responses/PreCloseOrAbortProcessed'
+        "202":
+          description: Only for abort operation.
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
@@ -269,6 +271,8 @@ paths:
       responses:
         "201":
           $ref: '#/components/responses/CloseProcessed'
+        "202":
+          description: Only for operation with KO outcome
         "400":
           $ref: 'common.yaml#/components/responses/Error'
         "401":
@@ -860,18 +864,22 @@ components:
             $ref: '#/components/schemas/PaymentToken'
         transactionId:
           $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
+        totalAmount:
+          $ref: 'common-payment-notice.yaml#/components/schemas/EuroCents'
         fee:
           $ref: 'common-payment-notice.yaml#/components/schemas/EuroCents'
       required:
         - outcome
         - paymentTokens
         - transactionId
+        - totalAmount
         - fee
       example:
         outcome: "PRE_CLOSE"
         paymentTokens:
           - "648fhg36s95jfg7DS"
         transactionId: "517a4216840E461fB011036A0fd134E1"
+        totalAmount: 10000
         fee: 50
     
     Abort:
@@ -1004,7 +1012,7 @@ components:
     # For preCloseOrAbort
     # ------------------------------------------------------
     PreCloseOrAbortProcessed:
-      description: Response to pre-close ora abort successfully processed
+      description: Response to pre-close or abort successfully processed
       headers:
         Location:
           description: URL to get the status of the transaction
