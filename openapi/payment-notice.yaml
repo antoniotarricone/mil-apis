@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Payment Notice Microservice
-  version: 13.0.0
+  version: 13.1.0
   description: Payment Notice Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -29,12 +29,13 @@ paths:
           $ref: '#/components/schemas/QrCodeBase64UrlEnc'
 
     # ------------------------------------------------------
-    # Verify a payment notice by QR-code
+    # Verifies a payment notice by QR-code
     # ------------------------------------------------------
     get:
       operationId: verifyByQrCode
-      summary: Verify a payment notice by QR-code
-      security: 
+      summary: Verifies a payment notice by QR-code
+      security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ verifyByQrCode ]
       responses:
         "200":
@@ -57,12 +58,13 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Activate the payment of a notice by QR-code
+    # Activates the payment of a notice by QR-code
     # ------------------------------------------------------
     patch:
       operationId: activateByQrCode
-      summary: Activate the payment of a notice by QR-code
-      security: 
+      summary: Activates the payment of a notice by QR-code
+      security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ activateByQrCode ]
       requestBody:
         $ref: '#/components/requestBodies/Activate'
@@ -107,16 +109,17 @@ paths:
         in: path
         required: true
         schema:
-          $ref: '#/components/schemas/NoticeNumber'
+          $ref: 'common-payment-notice.yaml#/components/schemas/NoticeNumber'
 
     # ------------------------------------------------------
-    # Verify a payment notice by PA tax code and notice
+    # Verifies a payment notice by PA tax code and notice
     # number
     # ------------------------------------------------------
     get:
       operationId: verifyByTaxCodeAndNoticeNumber
-      summary: Verify a payment notice by PA tax code and notice number
+      summary: Verifies a payment notice by PA tax code and notice number
       security: 
+        - ApiKeyAuth: [ ]
         - oAuth2: [ verifyByTaxCodeAndNoticeNumber ]
       responses:
         "200":
@@ -139,13 +142,14 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Activate the payment of a notice by PA tax code and
+    # Activates the payment of a notice by PA tax code and
     # notice number
     # ------------------------------------------------------
     patch:
       operationId: activateByTaxCodeAndNoticeNumber
-      summary: Activate the payment of a notice by PA tax code and notice number
+      summary: Activates the payment of a notice by PA tax code and notice number
       security: 
+        - ApiKeyAuth: [ ]
         - oAuth2: [ activateByTaxCodeAndNoticeNumber ]
       requestBody:
         $ref: '#/components/requestBodies/Activate'
@@ -181,12 +185,13 @@ paths:
       - $ref: 'common.yaml#/components/parameters/TerminalId'
 
     # ------------------------------------------------------
-    # Pre-close or abort the payment of a set of notices
+    # Pre-closes or aborts the payment of a set of notices
     # ------------------------------------------------------
     post:
       operationId: preCloseOrAbort
-      summary: Pre-close or abort the payment of a set of notices
-      security: 
+      summary: Pre-closes or aborts the payment of a set of notices
+      security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ preCloseOrAbort ]
       requestBody:
         $ref: '#/components/requestBodies/PreCloseOrAbort'
@@ -215,13 +220,14 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Get last 30 transactions executed by the client in the
-    # last 30 days
+    # Gets last 30 transactions executed by the client in
+    # the last 30 days
     # ------------------------------------------------------
     get:
       operationId: getLastTransactions
-      summary: Get last 30 transactions executed by the client in the last 30 days
-      security: 
+      summary: Gets last 30 transactions executed by the client in the last 30 days
+      security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ getLastTransactions ]
       responses:
         "200":
@@ -251,13 +257,14 @@ paths:
           $ref: 'common-payment-notice.yaml#/components/schemas/TransactionId'
 
     # ------------------------------------------------------
-    # Comunicate the outcome of the e-money transaction
+    # Comunicates the outcome of the e-money transaction
     # executed to pay a set of notices
     # ------------------------------------------------------
     patch:
       operationId: close
-      summary: Comunicate the outcome of the e-money transaction executed to pay a set of notices
-      security: 
+      summary: Comunicates the outcome of the e-money transaction executed to pay a set of notices
+      security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ close ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
@@ -293,13 +300,14 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Retrieve the status of the payment of a set of payment
-    # notices
+    # Retrieves the status of the payment of a set of
+    # payment notices
     # ------------------------------------------------------
     get:
       operationId: getPaymentStatus
-      summary: Retrieve the status of the payment of a set of payment notices
+      summary: Retrieves the status of the payment of a set of payment notices
       security: 
+        - ApiKeyAuth: [ ]
         - oAuth2: [ getPaymentStatus ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
@@ -329,13 +337,12 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Receive from the Nodo the result of the payment of a
+    # Receives from the Nodo the result of the payment of a
     # set of payment notices
     # ------------------------------------------------------
     post:
       operationId: receivePaymentStatus
-      tags: [ internal ]
-      summary: Receive from the Nodo the result of the payment of a set of payment notices. This API is invoked by the Nodo for sendPaymentResult.
+      summary: Receives from the Nodo the result of the payment of a set of payment notices. This API is invoked by the Nodo for sendPaymentResult.
       security:
         - ApiKeyAuth: [ ]
       requestBody:
@@ -435,12 +442,6 @@ components:
       type: string
       pattern: "^[ -~]{1,210}$"
       example: "This is a payment notice"
-
-    NoticeNumber:
-      description: Notice number
-      type: string
-      pattern: "^[0-9]{18}$"
-      example: "485564829563528563"
 
     Office:
       description: Name of the creditor company office
@@ -640,7 +641,7 @@ components:
         paTaxCode:
           $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
         noticeNumber:
-          $ref: '#/components/schemas/NoticeNumber'
+          $ref: 'common-payment-notice.yaml#/components/schemas/NoticeNumber'
         amount:
           $ref: 'common-payment-notice.yaml#/components/schemas/EuroCents'
         description:
@@ -803,7 +804,7 @@ components:
         paTaxCode:
           $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
         noticeNumber:
-          $ref: '#/components/schemas/NoticeNumber'
+          $ref: 'common-payment-notice.yaml#/components/schemas/NoticeNumber'
       required:
         - outcome
         - amount
@@ -888,6 +889,8 @@ components:
       properties:
         outcome:
           $ref: '#/components/schemas/AbortOutcome'
+        presetId:
+          $ref: 'common.yaml#/components/schemas/UUID'
         paymentTokens:
           type: array
           maxItems: 5
@@ -960,6 +963,8 @@ components:
                 type: string
                 format: date-time
                 maxLength: 19
+              presetId:
+                $ref: 'common.yaml#/components/schemas/UUID'
             required:
               - outcome
               - paymentMethod
@@ -1015,7 +1020,7 @@ components:
       description: Response to pre-close or abort successfully processed
       headers:
         Location:
-          description: URL to get the status of the transaction
+          description: URL to get the status of the transaction (only for pre-close operation)
           required: false
           schema:
             $ref: 'common.yaml#/components/schemas/URI'
