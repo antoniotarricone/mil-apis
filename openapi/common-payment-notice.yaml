@@ -1,6 +1,6 @@
 info:
   title: Common components for Payment Notice related services
-  version: 2.0.0
+  version: 2.1.0
   description: Payment Notice related services common components for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
