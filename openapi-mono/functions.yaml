@@ -6,7 +6,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 3.0.0
+  version: 3.1.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-functions
   description: DEV

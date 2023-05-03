@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Services Microservice
-  version: 3.0.0
+  version: 4.0.0
   description: Handling of end-user services for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -16,8 +16,9 @@ paths:
   /services:
     get:
       operationId: getServices
-      summary: Return the list of services available for end-users
-      security: 
+      summary: Returns the list of services available for end-users
+      security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ getServices ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
@@ -107,3 +108,6 @@ components:
   securitySchemes:
     oAuth2:
       $ref: 'common.yaml#/components/securitySchemes/oAuth2'
+    
+    ApiKeyAuth:
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
