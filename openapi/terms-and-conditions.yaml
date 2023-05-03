@@ -16,8 +16,9 @@ paths:
   /acceptedTermsConds:
     post:
       operationId: accept
-      summary: Store the acceptance of T&C for the user identified by the tax code stored in the session
+      summary: Stores the acceptance of T&C for the user identified by the tax code stored in the session
       security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ accept ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
@@ -49,10 +50,9 @@ paths:
   /acceptedTermsConds/{taxCode}:
     get:
       operationId: check
-      tags: [ internal ]
-      summary: Check the acceptance of T&C for the user identified by the tax code
+      summary: Checks the acceptance of T&C for the user identified by the tax code
       security:
-        - ApiKeyAuth: []
+        - ApiKeyAuth: [ ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'

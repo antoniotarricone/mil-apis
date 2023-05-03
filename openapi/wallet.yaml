@@ -16,8 +16,9 @@ paths:
   /cards:
     post:
       operationId: presaveExplicit
-      summary: Pre-save the payment card in the internal Wallet
+      summary: Pre-saves the payment card in the internal Wallet
       security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ presaveExplicit ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
@@ -64,3 +65,6 @@ components:
   securitySchemes:
     oAuth2:
       $ref: 'common.yaml#/components/securitySchemes/oAuth2'
+    
+    ApiKeyAuth:
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
