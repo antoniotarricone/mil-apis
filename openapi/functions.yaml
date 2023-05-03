@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Services Microservice
-  version: 4.0.0
+  version: 3.1.0
   description: Handling of end-user services for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
