@@ -15,9 +15,7 @@ security:
 paths:
   /confs/{acquirerId}/psp:
     get:
-      tags:
-      - internal
-      summary: Return the PSP data to communicate with Nodo and GEC
+      summary: Returns the PSP data to communicate with Nodo and GEC
       operationId: getPspConfig
       parameters:
       - name: RequestId
@@ -181,5 +179,5 @@ components:
     ApiKeyAuth:
       type: apiKey
       description: This API uses API key when it is invoked by a server application
-      name: Ocp-Apim-Subscription-Key
+      name: API-Key
       in: header

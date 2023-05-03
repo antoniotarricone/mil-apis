@@ -11,9 +11,9 @@ servers:
 - url: https://mil-d-apim.azure-api.net/mil-idp
   description: DEV
 paths:
-  /pwd/token:
+  /token:
     post:
-      summary: Return access token by means of resource owner password or refresh
+      summary: Returns access token by means of resource owner password or refresh
         token
       operationId: getAccessTokenByPassword
       parameters:
@@ -93,92 +93,9 @@ paths:
         default:
           description: Unexpected error
       security: []
-  /clt/token:
-    post:
-      summary: "Return access token by means of client credentials (modified, instead\
-        \ of client_secret, API key is used)"
-      operationId: getAccessTokenByApiKey
-      parameters:
-      - name: RequestId
-        in: header
-        description: Request Id that will be logged by services
-        required: true
-        schema:
-          $ref: '#/components/schemas/UUID'
-      - name: Version
-        in: header
-        description: Version of the required API
-        required: false
-        schema:
-          maxLength: 64
-          pattern: "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\\
-            d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\\
-            +([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
-          type: string
-          example: 1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay
-      - name: AcquirerId
-        in: header
-        description: Acquirer ID assigned by PagoPA
-        required: true
-        schema:
-          $ref: '#/components/schemas/AcquirerId'
-      - name: Channel
-        in: header
-        description: Channel originating the request
-        required: true
-        schema:
-          $ref: '#/components/schemas/Channel'
-      - name: MerchantId
-        in: header
-        description: Merchant ID. Mandatory when Channel equals POS.
-        required: false
-        schema:
-          $ref: '#/components/schemas/MerchantId'
-      - name: TerminalId
-        in: header
-        description: ID of the terminal originating the transaction. It must be unique
-          per acquirer and channel.
-        required: true
-        schema:
-          $ref: '#/components/schemas/TerminalId'
-      requestBody:
-        $ref: '#/components/requestBodies/GetAccessTokenByApiKey'
-      responses:
-        "201":
-          description: Response provided when an access token is requested
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AccessTokenWoRefresh'
-        "400":
-          description: Error response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Errors'
-        "401":
-          description: Wrong credentials.
-        "403":
-          description: Forbidden
-        "406":
-          description: Not acceptable. Did you require application/json?
-        "415":
-          description: Unsupported media type. Did you provide application/x-www-form-urlencoded?
-        "429":
-          description: Too many request
-        "500":
-          description: Error response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Errors'
-        default:
-          description: Unexpected error
-      security:
-      - ApiKeyAuth: []
   /.well-known/jwks.json:
     get:
-      summary: Return public keys
+      summary: Returns public keys
       operationId: getJwks
       responses:
         "200":
@@ -622,9 +539,3 @@ components:
         application/x-www-form-urlencoded:
           schema:
             $ref: '#/components/schemas/GetAccessTokenByClientCredentials'
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      description: This API uses API key when it is invoked by a server application
-      name: Ocp-Apim-Subscription-Key
-      in: header

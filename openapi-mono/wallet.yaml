@@ -13,7 +13,7 @@ servers:
 paths:
   /cards:
     post:
-      summary: Pre-save the payment card in the internal Wallet
+      summary: Pre-saves the payment card in the internal Wallet
       operationId: presaveExplicit
       parameters:
       - name: RequestId
@@ -97,6 +97,7 @@ paths:
         default:
           description: Unexpected error
       security:
+      - ApiKeyAuth: []
       - oAuth2:
         - presaveExplicit
 components:
@@ -238,48 +239,32 @@ components:
       description: This API uses OAuth2
       flows:
         password:
-          tokenUrl: ../mil-idp/pwd/token
+          tokenUrl: ../mil-idp/token
           scopes:
-            verifyByQrCode: Verify a payment notice by QR-code
-            activateByQrCode: Activate the payment of a notice by QR-code
-            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code
+            verifyByQrCode: Verifies a payment notice by QR-code
+            activateByQrCode: Activats the payment of a notice by QR-code
+            verifyByTaxCodeAndNoticeNumber: Verifies a payment notice by PA tax code
               and notice number
-            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
+            activateByTaxCodeAndNoticeNumber: Activates the payment of a notice by
               PA tax code and notice number
-            preCloseOrAbort: Pre-close or abort the payment of a set of notices
-            close: Close the payment of a set of notices
-            getPaymentStatus: Retrieve the status of the payment of a set of payment
+            preCloseOrAbort: Pre-closes or aborts the payment of a set of notices
+            close: Closes the payment of a set of notices
+            getPaymentStatus: Retrieves the status of the payment of a set of payment
               notices
-            getLastTransactions: Get last 30 transactions executed by the client in
-              the last 30 days
-            getFee: Calculate the fee amount for a set of payment notices
-            getServices: Return the list of services available for end-users
-            deleteSessionById: Delete a session by ID
-            createSession: Create a session
-            checkPairingStatus: Retrieve the pairing status with IO
-            accept: Store the acceptance of T&C for the user identified by the tax
+            getLastTransactions: Gets last 30 transactions executed by the client
+              in the last 30 days
+            getFee: Calculates the fee amount for a set of payment notices
+            getServices: Returns the list of services available for end-users
+            deleteSessionById: Deletes a session by ID
+            createSession: Creates a session
+            checkPairingStatus: Retrieves the pairing status with IO
+            accept: Stores the acceptance of T&C for the user identified by the tax
               code stored in the session
-            presaveExplicit: Pre-save the payment card in the internal Wallet
-        clientCredentials:
-          tokenUrl: ../mil-ipd/clt/token
-          scopes:
-            verifyByQrCode: Verify a payment notice by QR-code
-            activateByQrCode: Activate the payment of a notice by QR-code
-            verifyByTaxCodeAndNoticeNumber: Verify a payment notice by PA tax code
-              and notice number
-            activateByTaxCodeAndNoticeNumber: Activate the payment of a notice by
-              PA tax code and notice number
-            preCloseOrAbort: Pre-close or abort the payment of a set of notices
-            close: Close the payment of a set of notices
-            getPaymentStatus: Retrieve the status of the payment of a set of payment
-              notices
-            getLastTransactions: Get last 30 transactions executed by the client in
-              the last 30 days
-            getFee: Calculate the fee amount for a set of payment notices
-            getServices: Return the list of services available for end-users
-            deleteSessionById: Delete a session by ID
-            createSession: Create a session
-            checkPairingStatus: Retrieve the pairing status with IO
-            accept: Store the acceptance of T&C for the user identified by the tax
-              code stored in the session
-            presaveExplicit: Pre-save the payment card in the internal Wallet
+            presaveExplicit: Pre-saves the payment card in the internal Wallet
+            getPreset: Returns the details of a preset operation that has not yet
+              been executed
+    ApiKeyAuth:
+      type: apiKey
+      description: This API uses API key when it is invoked by a server application
+      name: API-Key
+      in: header

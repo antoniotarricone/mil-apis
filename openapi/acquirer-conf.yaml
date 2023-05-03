@@ -19,8 +19,7 @@ paths:
   /confs/{acquirerId}/psp:
     get:
       operationId: getPspConfig
-      tags: [ internal ]
-      summary: Return the PSP data to communicate with Nodo and GEC
+      summary: Returns the PSP data to communicate with Nodo and GEC
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
         - $ref: 'common.yaml#/components/parameters/Version'
