@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Identity Provider Microservice
-  version: 1.1.0
+  version: 2.0.0
   description: Identity Provider Microservice for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -13,10 +13,10 @@ servers:
     url: https://mil-d-apim.azure-api.net/mil-idp
 
 paths:
-  /pwd/token:
+  /token:
     post:
       operationId: getAccessTokenByPassword
-      summary: Return access token by means of resource owner password or refresh token
+      summary: Returns access token by means of resource owner password or refresh token
       security: [ ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
@@ -47,45 +47,10 @@ paths:
         default:
           description: Unexpected error
 
-  /clt/token:
-    post:
-      operationId: getAccessTokenByApiKey
-      summary: Return access token by means of client credentials (modified, instead of client_secret, API key is used)
-      security:
-        - ApiKeyAuth: [ ]
-      parameters:
-        - $ref: 'common.yaml#/components/parameters/RequestId'
-        - $ref: 'common.yaml#/components/parameters/Version'
-        - $ref: 'common.yaml#/components/parameters/AcquirerId'
-        - $ref: 'common.yaml#/components/parameters/Channel'
-        - $ref: 'common.yaml#/components/parameters/MerchantId'
-        - $ref: 'common.yaml#/components/parameters/TerminalId'
-      requestBody:
-        $ref: '#/components/requestBodies/GetAccessTokenByApiKey'
-      responses:
-        "201":
-          $ref: '#/components/responses/AccessTokenWoRefresh'
-        "400":
-          $ref: 'common.yaml#/components/responses/Error'
-        "401":
-          description: Wrong credentials.
-        "403":
-          description: Forbidden
-        "406":
-          description: Not acceptable. Did you require application/json?
-        "415":
-          description: Unsupported media type. Did you provide application/x-www-form-urlencoded?
-        "429":
-          description: Too many request
-        "500":
-          $ref: 'common.yaml#/components/responses/Error'
-        default:
-          description: Unexpected error
-
   /.well-known/jwks.json:
     get:
       operationId: getJwks
-      summary: Return public keys
+      summary: Returns public keys
       security: [ ]
       responses:
         "200":
@@ -469,10 +434,3 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/PublicKeys'
-  
-  # ========================================================
-  # Security schemes
-  # ========================================================
-  securitySchemes:
-    ApiKeyAuth:
-      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'

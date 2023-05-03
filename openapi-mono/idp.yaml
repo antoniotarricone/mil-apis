@@ -6,7 +6,7 @@ info:
   contact:
     name: Antonio Tarricone
     email: antonio.tarricone@pagopa.it
-  version: 1.1.0
+  version: 2.0.0
 servers:
 - url: https://mil-d-apim.azure-api.net/mil-idp
   description: DEV
