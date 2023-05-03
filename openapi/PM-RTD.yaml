@@ -18,12 +18,12 @@ security:
 paths:
   /tokens:
     # ------------------------------------------------------
-    # Create or retrieve, if it already exists, the token of
-    # a given PAN.
+    # Creates or retrieves, if it already exists, the token
+    # of a given PAN.
     # ------------------------------------------------------
     post:
       operationId: retrieveToken
-      summary: Create or retrieve, if it already exists, the token of a given PAN
+      summary: Creates or retrieves, if it already exists, the token of a given PAN
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
       requestBody:
@@ -56,7 +56,7 @@ paths:
     # ------------------------------------------------------
     get:
       operationId: getPan
-      summary: Retrieve the PAN of a given token
+      summary: Retrieves the PAN of a given token
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
         - name: panToken

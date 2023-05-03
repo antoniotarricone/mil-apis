@@ -18,13 +18,13 @@ security:
 paths:
   /cards/{panToken}/taxCode:
     # ------------------------------------------------------
-    # Retrieve the tax code of the owner of the payment card
-    # that has the PAN linked to the given token.
+    # Retrieves the tax code of the owner of the payment
+    # card that has the PAN linked to the given token.
     # ------------------------------------------------------
     get:
       operationId: retrieveTaxCode
-      summary: Retrieve the tax code of the owner of the payment card that has the PAN linked to the given token
-      description: Retrieve the tax code by querying internal DB or invoking Bancomat, Nexi, SIA, Intesa Sanpaolo, Poste Italiane or ICCREA service
+      summary: Retrieves the tax code of the owner of the payment card that has the PAN linked to the given token
+      description: Retrieves the tax code by querying internal DB or invoking Bancomat, Nexi, SIA, Intesa Sanpaolo, Poste Italiane or ICCREA service
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
         - name: panToken
@@ -55,12 +55,11 @@ paths:
 
   /cards:
     # ------------------------------------------------------
-    # Retrieve the tax code of the owner of the payment card
-    # that has the PAN linked to the given token.
+    # Pre-saves a payment card in the Wallet.
     # ------------------------------------------------------
     post:
       operationId: presave
-      summary: Pre-save a payment card in the Wallet
+      summary: Pre-saves a payment card in the Wallet
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
       requestBody:
@@ -87,11 +86,11 @@ paths:
 
   /enabledServices/{taxCode}/saveNewCards:
     # ------------------------------------------------------
-    # Get the value of the flag "save new cards".
+    # Gets the value of the flag "save new cards".
     # ------------------------------------------------------
     get:
       operationId: getSaveNewCardsFlag
-      summary: Get the value of the flag "save new cards"
+      summary: Gets the value of the flag "save new cards"
       parameters:
         - $ref: 'common.yaml#/components/parameters/Version'
         - name: taxCode
