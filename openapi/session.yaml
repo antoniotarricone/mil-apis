@@ -29,12 +29,11 @@ paths:
           $ref: 'common.yaml#/components/schemas/UUID'
 
     # ------------------------------------------------------
-    # Read session by ID
+    # Reads session by ID
     # ------------------------------------------------------
     get:
       operationId: getSessionById
-      tags: [ internal ]
-      summary: Read a session by ID
+      summary: Reads a session by ID
       security:
         - ApiKeyAuth: [ ]
       responses:
@@ -58,12 +57,13 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Delete session by ID
+    # Deletes session by ID
     # ------------------------------------------------------
     delete:
       operationId: deleteSessionById
-      summary: Delete a session by ID
+      summary: Deletes a session by ID
       security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ deleteSessionById ]
       responses:
         "204":
@@ -86,12 +86,11 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Update partially session by ID
+    # Updates partially session by ID
     # ------------------------------------------------------
     patch:
       operationId: updateSessionById
-      tags: [ internal ]
-      summary: Update partially a session by ID
+      summary: Updates partially a session by ID
       security:
         - ApiKeyAuth: [ ]
       requestBody:
@@ -128,12 +127,13 @@ paths:
       - $ref: 'common.yaml#/components/parameters/TerminalId'
 
     # ------------------------------------------------------
-    # Create a session
+    # Creates a session
     # ------------------------------------------------------
     post:
       operationId: createSession
-      summary: Create a session
+      summary: Creates a session
       security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ createSession ]
       requestBody:
         $ref: '#/components/requestBodies/CreateSession'
@@ -160,12 +160,13 @@ paths:
           description: Unexpected error
 
     # ------------------------------------------------------
-    # Check pairing status
+    # Checks pairing status
     # ------------------------------------------------------
     get:
       operationId: checkPairingStatus
-      summary: Retrieve the pairing status with IO
+      summary: Retrieves the pairing status with IO
       security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ checkPairingStatus ]
       parameters:
         - name: pairingToken
@@ -200,8 +201,7 @@ paths:
     # ------------------------------------------------------
     post:
       operationId: pair
-      tags: [ internal ]
-      summary: Pair the session with IO
+      summary: Pairs the session with IO
       security:
         - ApiKeyAuth: [ ]
       parameters:
