@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Fee Calculator Microservice
-  version: 3.0.0
+  version: 4.0.0
   description: Fee Calculator for Multi-channel Integration Layer of SW Client Project
   contact:
     name: Antonio Tarricone
@@ -15,12 +15,13 @@ servers:
 paths:
   /fees:
     # ------------------------------------------------------
-    # Calculate the fee amount for a set of payment notices
+    # Calculates the fee amount for a set of payment notices
     # ------------------------------------------------------
     post:
       operationId: getFee
-      summary: Calculate the fee amount for a set of payment notices
-      security: 
+      summary: Calculates the fee amount for a set of payment notices
+      security:
+        - ApiKeyAuth: [ ]
         - oAuth2: [ getFee ]
       parameters:
         - $ref: 'common.yaml#/components/parameters/RequestId'
@@ -140,3 +141,6 @@ components:
   securitySchemes:
     oAuth2:
       $ref: 'common.yaml#/components/securitySchemes/oAuth2'
+    
+    ApiKeyAuth:
+      $ref: 'common.yaml#/components/securitySchemes/ApiKeyAuth'
