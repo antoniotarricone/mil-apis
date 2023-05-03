@@ -25,6 +25,12 @@ components:
       maximum: 99999999999
       example: 12345
 
+    NoticeNumber:
+      description: Notice number
+      type: string
+      pattern: "^[0-9]{18}$"
+      example: "485564829563528563"
+    
     PaTaxCode:
       description: Tax code of the creditor company
       type: string
