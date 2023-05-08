@@ -222,7 +222,7 @@ paths:
       security:
       - oAuth2:
         - unsubscribe
-  /terminals/{paTaxCode}/:
+  /terminals/{paTaxCode}:
     get:
       summary: Returns the list of subscribed terminals
       operationId: getSubscribers

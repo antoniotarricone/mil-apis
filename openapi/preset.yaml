@@ -84,7 +84,7 @@ paths:
         default:
           description: Unexpected error
 
-  /terminals/{paTaxCode}/:
+  /terminals/{paTaxCode}:
     get:
       operationId: getSubscribers
       summary: Returns the list of subscribed terminals
