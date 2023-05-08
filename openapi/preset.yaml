@@ -1,0 +1,632 @@
+openapi: 3.0.3
+
+info:
+  title: Preset Microservice
+  version: 1.0.0
+  description: This microservice handles preset operations
+  contact:
+    name: Antonio Tarricone
+    email: antonio.tarricone@pagopa.it
+
+servers:
+  - description: DEV
+    url: https://mil-d-apim.azure-api.net/mil-preset
+
+paths:
+  # ------------------------------------------------------
+  # Terminals
+  # ------------------------------------------------------
+  /terminals:
+    post:
+      operationId: subscribe
+      summary: Subscribes a terminal to handle preset operations
+      security:
+        - oAuth2: [ subscribe ]
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/MerchantId'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+      requestBody:
+        $ref: '#/components/requestBodies/Subscribe'
+      responses:
+        "201":
+          $ref: '#/components/responses/Subscribe'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: Access token or API key is missing or invalid
+        "403":
+          description: Forbidden
+        "409":
+          $ref: '#/components/responses/Subscribe'
+        "415":
+          description: Unsupported media type. Did you provide application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+  /terminals/{paTaxCode}/{subscriberId}:
+    delete:
+      operationId: unsubscriberForPreset
+      summary: Unsubscribes a terminal to handle preset operations
+      security:
+        - oAuth2: [ unsubscribe ]
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: '#/components/parameters/AcquirerId'
+        - $ref: '#/components/parameters/Channel'
+        - $ref: '#/components/parameters/MerchantId'
+        - $ref: '#/components/parameters/TerminalId'
+        - $ref: '#/components/parameters/PaTaxCode'
+        - $ref: '#/components/parameters/SubscriberId'
+      responses:
+        "204":
+          description: Terminal unsubscribed correctly
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: Access token or API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Subscription not found
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+  /terminals/{paTaxCode}/:
+    get:
+      operationId: getSubscribers
+      summary: Returns the list of subscribed terminals
+      security:
+        - oAuth2: [ getSubscribers ]
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: '#/components/parameters/PaTaxCode'
+      responses:
+        "200":
+          $ref: '#/components/responses/Subscribes'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: Access token or API key is missing or invalid
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+  # ------------------------------------------------------
+  # Presets
+  # ------------------------------------------------------
+  /presets:
+    post:
+      operationId: createPreset
+      summary: Creates a preset operation
+      security:
+        - oAuth2: [ createPreset ]
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+      requestBody:
+        $ref: '#/components/requestBodies/CreatePreset'
+      responses:
+        "201":
+          $ref: '#/components/responses/PresetCreated'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: Access token or API key is missing or invalid
+        "403":
+          description: Forbidden
+        "415":
+          description: Unsupported media type. Did you provide application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+  /presets/{paTaxCode}/{subscriberId}:
+    get:
+      operationId: getPresets
+      summary: Returns preset operations for a specific subscriber
+      security:
+        - oAuth2: [ getPresets ]
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: '#/components/parameters/PaTaxCode'
+        - $ref: '#/components/parameters/SubscriberId'
+      responses:
+        "200":
+          $ref: '#/components/responses/Presets'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: Access token or API key is missing or invalid
+        "403":
+          description: Forbidden
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+  /presets/{paTaxCode}/{subscriberId}/last_to_execute:
+    get:
+      operationId: getLastPresetToExecute
+      summary: Returns last preset operation to execute
+      security:
+        - oAuth2: [ getLastPresetToExecute ]
+      parameters:
+        - $ref: 'common.yaml#/components/parameters/RequestId'
+        - $ref: 'common.yaml#/components/parameters/Version'
+        - $ref: 'common.yaml#/components/parameters/AcquirerId'
+        - $ref: 'common.yaml#/components/parameters/Channel'
+        - $ref: 'common.yaml#/components/parameters/MerchantId'
+        - $ref: 'common.yaml#/components/parameters/TerminalId'
+        - $ref: '#/components/parameters/PaTaxCode'
+        - $ref: '#/components/parameters/SubscriberId'
+      responses:
+        "200":
+          $ref: '#/components/responses/Preset'
+        "400":
+          $ref: 'common.yaml#/components/responses/Error'
+        "401":
+          description: Access token or API key is missing or invalid
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+        "406":
+          description: Not acceptable. Did you require application/json?
+        "429":
+          description: Too many request
+        "500":
+          $ref: 'common.yaml#/components/responses/Error'
+        default:
+          description: Unexpected error
+
+components:
+  # ========================================================
+  # Schemas
+  # ========================================================
+  schemas:
+    # ------------------------------------------------------
+    # Basic types
+    # ------------------------------------------------------
+    Status:
+      description: Operation status
+      type: string
+      enum:
+        - TO_EXECUTE
+        - EXECUTED
+      example: "TO_EXECUTE"
+
+    Type:
+      description: Opertion type
+      type: string
+      enum:
+        - PAYMENT_NOTICE
+      example: "PAYMENT_NOTICE"
+
+    SubscriberId:
+      description: Subscriber ID
+      type: string
+      pattern: "^[0-9a-z]{6}$"
+      example: "x46tr3"
+
+    # ------------------------------------------------------
+    # Complex types
+    # ------------------------------------------------------
+    #
+    # For createPreset
+    #
+    Operation:
+      description: Generic operation
+      type: object
+      additionalProperties: true
+      properties:
+        operationType:
+          $ref: '#/components/schemas/Type'
+        paTaxCode:
+          $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
+        subscriberId:
+          $ref: '#/components/schemas/SubscriberId'
+      required:
+        - operationType
+        - paTaxCode
+        - subscriberId
+    
+    #
+    # For getPresets
+    #
+    OperationDetails:
+      description: Details of a generic operation
+      type: object
+      additionalProperties: true
+      properties:
+        presetId:
+          $ref: 'common.yaml#/components/schemas/UUID'
+        creationTimestamp:
+          description: Creation timestamp
+          type: string
+          format: date-time
+          maxLength: 19
+        status:
+          $ref: '#/components/schemas/Status'
+        statusTimestamp:
+          description: Timestamp of the last status update
+          type: string
+          format: date-time
+          maxLength: 19
+      required:
+        - presetId
+        - creationTimestamp
+        - status
+        - statusTimestamp
+
+    #
+    # For createPreset
+    #
+    PaymentNotice:
+      description: Operation of payment of a notice
+      allOf: 
+        - $ref: '#/components/schemas/Operation'
+        - type: object
+          additionalProperties: true
+          properties:
+            noticeTaxCode:
+              $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
+            noticeNumber:
+              $ref: 'common-payment-notice.yaml#/components/schemas/NoticeNumber'
+          required:
+            - noticeTaxCode
+            - noticeNumber
+      example:
+        operationType: "PAYMENT_NOTICE"
+        paTaxCode: "15376371009"
+        subscriberId: "x46tr3"
+        noticeTaxCode: "15376371009"
+        noticeNumber: "485564829563528563"
+            
+    #
+    # For getPresets
+    #
+    PaymentNoticeDetails:
+      description: Details of a payment notice as preset operation
+      allOf:
+        - $ref: '#/components/schemas/PaymentNotice'
+        - $ref: '#/components/schemas/OperationDetails'
+        - type: object
+          additionalProperties: true
+          properties:
+            statusDetails:
+              $ref: 'payment-notice.yaml#/components/schemas/PaymentStatus'
+          required:
+            - statusDetails
+      example:
+        operationType: "PAYMENT_NOTICE"
+        paTaxCode: "15376371009"
+        subscriberId: "x46tr3"
+        noticeTaxCode: "15376371009"
+        noticeNumber: "485564829563528563"
+        presetId: "d0d654e6-97da-4848-b568-99fedccb642b"
+        creationTimestamp: "2023-05-05T16:35:30"
+        status: "EXECUTED"
+        statusTimestamp: "2023-05-05T16:36:30"
+        statusDetails:
+          transactionId: "517a4216840E461fB011036A0fd134E1"
+          acquirerId: "4585625"
+          channel: "POS"
+          merchantId: "28405fHfk73x88D"
+          terminalId: "0aB9wXyZ"
+          insertTimestamp: "2023-04-11T16:20:34"
+          notices:
+            - paymentToken: "648fhg36s95jfg7DS"
+              paTaxCode: "15376371009"
+              noticeNumber: "485564829563528563"
+              amount: 12345
+              description: "Health ticket for chest x-ray"
+              company: "ASL Roma"
+              office: "Ufficio di Roma"
+          totalAmount: 12395
+          fee: 50
+          status: "PRE_CLOSE"
+
+    #
+    # For subscribe
+    #
+    Subscribe:
+      description: Request to subscribe a terminal to handle preset operations
+      type: object
+      additionalProperties: false
+      properties:
+        paTaxCode:
+          $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
+        label:
+          description: Mnemonic terminal label
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/Message'
+      example:
+        paTaxCode: "15376371009"
+        label: "Reception POS"
+
+    #
+    # For getSubscribers
+    #
+    Subscriber:
+      description: Subscriber data
+      type: object
+      additionalProperties: false
+      properties:
+        acquirerId:
+          $ref: 'common.yaml#/components/schemas/AcquirerId'
+        channel:
+          $ref: 'common.yaml#/components/schemas/Channel'
+        merchantId:
+          $ref: 'common.yaml#/components/schemas/MerchantId'
+        terminalId:
+          $ref: 'common.yaml#/components/schemas/TerminalId'
+        paTaxCode:
+          $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
+        subscriberId:
+          $ref: '#/components/schemas/SubscriberId'
+        label:
+          description: Mnemonic terminal label
+          allOf:
+            - $ref: 'common.yaml#/components/schemas/Message'
+        subscriptionTimestamp:
+          description: Subscription timestamp
+          type: string
+          format: date-time
+          maxLength: 19
+        lastUsageTimestamp:
+          description: Last usage timestamp
+          type: string
+          format: date-time
+          maxLength: 19
+      required:
+        - acquirerId
+        - channel
+        - merchantId
+        - terminalId
+        - paTaxCode
+        - subscriberId
+        - label
+        - subscriptionTimestamp
+        - lastUsageTimestamp
+      example:
+        acquirerId: "4585625"
+        channel: "POS"
+        merchantId: "28405fHfk73x88D"
+        terminalId: "0aB9wXyZ"
+        paTaxCode: "15376371009"
+        subscriberId: "x46tr3"
+        label: "Reception POS"
+        subscriptionTimestamp: "2023-05-05T09:31:33"
+        lastUsageTimestamp: "2023-05-08T10:55:57"
+
+    #
+    # For getSubscribers
+    #
+    Subscribers:
+      description: List of subscribed terminals
+      type: object
+      additionalProperties: false
+      properties:
+        subscribers:
+          type: array
+          maxItems: 2176782336
+          items:
+            $ref: '#/components/schemas/Subscriber'
+      required:
+        - subscribers
+      example:
+        subscribers:
+          - acquirerId: "4585625"
+            channel: "POS"
+            merchantId: "28405fHfk73x88D"
+            terminalId: "0aB9wXyZ"
+            paTaxCode: "15376371009"
+            subscriberId: "x46tr3"
+            label: "Reception POS"
+            subscriptionTimestamp: "2023-05-05T09:31:33"
+            lastUsageTimestamp: "2023-05-08T10:55:57"
+
+    #
+    # For getPresets and getLastPresetToExecute
+    #
+    Preset:
+      description: Preset operation with detailed status data
+      oneOf:
+        - $ref: '#/components/schemas/PaymentNoticeDetails'
+      discriminator:
+        propertyName: operationType
+        mapping:
+          PAYMENT_NOTICE: '#/components/schemas/PaymentNoticeDetails'
+      
+    #
+    # For getPresets
+    #
+    Presets:
+      description: List of preset operations
+      type: object
+      additionalProperties: false
+      properties:
+        presets:
+          type: array
+          maxItems: 2176782336
+          items:
+            $ref: '#/components/schemas/Preset'
+      required:
+        - presets
+
+  # ========================================================
+  # Parameters
+  # ========================================================
+  parameters:
+    AcquirerId:
+      name: AcquirerId
+      in: header
+      description: Acquirer ID assigned by PagoPA. If the request comes from a terminal, the parameter is mandatory.
+      required: false
+      schema:
+        $ref: 'common.yaml#/components/schemas/AcquirerId'
+
+    Channel:
+      name: Channel
+      in: header
+      description: Channel originating the request. If the request comes from a terminal, the parameter is mandatory.
+      required: false
+      schema:
+        $ref: 'common.yaml#/components/schemas/Channel'
+
+    MerchantId:
+      name: MerchantId
+      description: Merchant ID. If the request comes from a POS, the parameter is mandatory.
+      in: header
+      required: false
+      schema:
+        $ref: 'common.yaml#/components/schemas/MerchantId'
+
+    TerminalId:
+      name: TerminalId
+      in: header
+      description: ID of the terminal originating the transaction. If the request comes from a terminal, the parameter is mandatory.
+      required: false
+      schema:
+        $ref: 'common.yaml#/components/schemas/TerminalId'
+
+    PaTaxCode:
+      name: paTaxCode
+      in: path
+      description: Tax code of the creditor company
+      required: true
+      schema:
+        $ref: 'common-payment-notice.yaml#/components/schemas/PaTaxCode'
+
+    SubscriberId:
+      name: subscriberId
+      in: path
+      description: ID assigned to subscribed terminal
+      required: true
+      schema:
+        $ref: '#/components/schemas/SubscriberId'
+
+  # ========================================================
+  # Request bodies
+  # ========================================================
+  requestBodies:
+    #
+    # For createPreset
+    #
+    CreatePreset:
+      description: Request to create as preset operation
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/PaymentNotice'
+            discriminator:
+              propertyName: operationType
+              mapping:
+                PAYMENT_NOTICE: '#/components/schemas/PaymentNotice'
+
+    #
+    # For subscribe
+    #
+    Subscribe:
+      description: Request to subscribe a terminal to handle preset operations
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Subscribe'
+    
+  # ========================================================
+  # Responses
+  # ========================================================
+  responses:
+    #
+    # For createPreset
+    #
+    PresetCreated:
+      description: Preset operation created successfully
+      headers:
+        Location:
+          description: URL to preset operation
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/URI'
+          example:
+            Location: "/terminals/15376371009/x46tr3/d0d654e6-97da-4848-b568-99fedccb642b"
+
+    #
+    # For subscribe
+    #
+    Subscribe:
+      description: Terminal subscribed successfully or already subscribed
+      headers:
+        Location:
+          description: URL to subscribed terminal
+          required: true
+          schema:
+            $ref: 'common.yaml#/components/schemas/URI'
+          example:
+            Location: "/terminals/15376371009/x46tr3"
+
+    #
+    # For getSubscribers
+    #
+    Subscribes:
+      description: List of subscribed terminals
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Subscribers'
+
+    #
+    # For getPresets
+    #
+    Presets:
+      description: List of preset operations
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Presets'
+
+    # For getLastPresetToExecute
+    Preset:
+      description: Last preset to execute
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Preset'
+
+  # ========================================================
+  # Security schemes
+  # ========================================================
+  securitySchemes:
+    oAuth2:
+      $ref: 'common.yaml#/components/securitySchemes/oAuth2'

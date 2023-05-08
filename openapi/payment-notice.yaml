@@ -771,6 +771,7 @@ components:
     VerifyOrActivateKo:
       description: Response to verify or activate payment notice when something went wrong
       type: object
+      additionalProperties: false
       properties:
         outcome:
           $ref: '#/components/schemas/KoOutcome'
@@ -786,6 +787,7 @@ components:
     VerifyOk:
       description: Response to verify payment notice when all went ok
       type: object
+      additionalProperties: true
       properties:
         outcome:
           $ref: '#/components/schemas/OkOutcome'
@@ -823,6 +825,7 @@ components:
     ActivateOk:
       description: Response to activate payment notice when all went ok
       type: object
+      additionalProperties: true
       properties:
         outcome:
           $ref: '#/components/schemas/OkOutcome'
@@ -886,6 +889,7 @@ components:
     Abort:
       description: Request to abort the payment of a set of payment notices
       type: object
+      additionalProperties: true
       properties:
         outcome:
           $ref: '#/components/schemas/AbortOutcome'

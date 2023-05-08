@@ -1169,6 +1169,7 @@ components:
       properties:
         outcome:
           $ref: '#/components/schemas/KoOutcome'
+      additionalProperties: false
       description: Response to verify or activate payment notice when something went
         wrong
       example:
@@ -1199,6 +1200,7 @@ components:
           $ref: '#/components/schemas/PaTaxCode'
         noticeNumber:
           $ref: '#/components/schemas/NoticeNumber'
+      additionalProperties: true
       description: Response to verify payment notice when all went ok
       example:
         outcome: OK
@@ -1223,6 +1225,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Transfer'
+      additionalProperties: true
       description: Response to activate payment notice when all went ok
       example:
         outcome: OK
@@ -1278,6 +1281,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PaymentToken'
+      additionalProperties: true
       description: Request to abort the payment of a set of payment notices
       example:
         outcome: ABORT

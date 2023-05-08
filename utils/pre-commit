@@ -12,6 +12,7 @@ declare -a descriptors=(
   "wallet.yaml"
   "acquirer-conf.yaml"
   "idp.yaml"
+  "preset.yaml"
 )
 
 # Prepare destination folder.
